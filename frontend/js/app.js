@@ -795,12 +795,19 @@ async function submitCodeReview(compType, status) {
 
 async function executePipeline() {
     const btn = document.getElementById("run-pipeline-btn");
-    const region = document.getElementById("exec-region-input").value;
     const lookback = parseInt(document.getElementById("exec-lookback-input").value) || 30;
+    
+    // Find regions for the selected service from active services
+    const serviceObj = globalActiveServices.find(s => s.service_name === currentReviewService);
+    if (!serviceObj || !serviceObj.regions || serviceObj.regions.size === 0) {
+        showToast(`No regions found for ${currentReviewService} with active billing.`, "error");
+        return;
+    }
+    const regions = Array.from(serviceObj.regions);
     
     btn.setAttribute("disabled", "true");
     btn.textContent = "Running Pipeline scanner...";
-    showToast(`Running pipeline for ${currentReviewService} in region ${region}...`, "info");
+    showToast(`Running pipeline for ${currentReviewService} in regions: ${regions.join(", ")}...`, "info");
     
     try {
         const response = await fetch(`${API_BASE}/execution/run`, {
@@ -809,7 +816,7 @@ async function executePipeline() {
             body: JSON.stringify({
                 config_id: activeConfigId,
                 service_name: currentReviewService,
-                region: region,
+                regions: regions,
                 lookback_days: lookback
             })
         });

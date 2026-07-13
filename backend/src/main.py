@@ -67,7 +67,7 @@ class CodeReviewRequestSchema(BaseModel):
 class RunPipelineRequestSchema(BaseModel):
     config_id: int
     service_name: str
-    region: str
+    regions: List[str]
     lookback_days: Optional[int] = 30
 
 
@@ -446,40 +446,50 @@ def run_service_execution(data: RunPipelineRequestSchema):
         )
         
     try:
-        # Run execution pipeline (discovers resources, fetches metrics, saves to store)
-        result = run_pipeline_for_service(
-            config_id=data.config_id,
-            service_name=data.service_name,
-            region=data.region,
-            lookback_days=data.lookback_days
-        )
+        total_resources_analyzed = 0
+        all_recommendations = []
         
-        if result["status"] == "failed":
-            raise HTTPException(status_code=500, detail=result["error"])
-            
-        # Run recommendations for each successfully processed resource
-        recommendations = []
-        for res in result["resources"]:
-            # Generate recommendations
-            rec_result = generate_recommendation_for_resource(
+        for region in data.regions:
+            # Run execution pipeline (discovers resources, fetches metrics, saves to store)
+            result = run_pipeline_for_service(
                 config_id=data.config_id,
-                resource_id=res["id"],
-                service_type=data.service_name,
-                region=data.region,
-                resource_capacity_type=res["type"],
-                lookback_days=data.lookback_days,
-                metadata=res.get("metadata", {})
+                service_name=data.service_name,
+                region=region,
+                lookback_days=data.lookback_days
             )
-            recommendations.append(rec_result)
             
+            if result["status"] == "failed":
+                # For multiple regions, one might fail while others succeed. 
+                # Let's raise an error for now, or we could collect errors.
+                # Assuming failing the whole request is safest to alert the user.
+                raise HTTPException(status_code=500, detail=f"Execution failed in region {region}: {result['error']}")
+                
+            total_resources_analyzed += len(result["resources"])
+            
+            # Run recommendations for each successfully processed resource
+            for res in result["resources"]:
+                # Generate recommendations
+                rec_result = generate_recommendation_for_resource(
+                    config_id=data.config_id,
+                    resource_id=res["id"],
+                    service_type=data.service_name,
+                    region=region,
+                    resource_capacity_type=res["type"],
+                    lookback_days=data.lookback_days,
+                    metadata=res.get("metadata", {})
+                )
+                all_recommendations.append(rec_result)
+                
         return {
             "service_name": data.service_name,
-            "region": data.region,
-            "resources_analyzed": len(result["resources"]),
-            "recommendations": recommendations
+            "regions": data.regions,
+            "resources_analyzed": total_resources_analyzed,
+            "recommendations": all_recommendations
         }
+    except HTTPException:
+        raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=f"Pipeline execution failed: {e}")
 
 @app.get("/api/recommendations")
 def get_recommendations(config_id: Optional[int] = Query(None), service_name: Optional[str] = None, region: Optional[str] = None):
