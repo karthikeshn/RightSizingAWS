@@ -102,7 +102,9 @@ The function must return a list of dictionaries, where each dictionary represent
 - `type`: The current capacity type of the resource (e.g. 't3.micro', 'db.r5.large').
 - `metadata`: A dictionary containing ONLY the following properties: 'Name', 'Availability Zone', and 'Region'. Do not include any other extensive metadata.
 
-CRITICAL INSTRUCTION: You must ONLY discover and return the PRIMARY resources for the selected service. For example, if the service is EC2, you must only return EC2 Instances. You MUST completely ignore and exclude dependent or related resources such as Security Groups, EBS Volumes, Network Interfaces, Elastic IPs, Key Pairs, Subnets, etc.
+CRITICAL INSTRUCTION 1: You must ONLY discover and return the PRIMARY resources for the selected service. For example, if the service is EC2, you must only return EC2 Instances. You MUST completely ignore and exclude dependent or related resources such as Security Groups, EBS Volumes, Network Interfaces, Elastic IPs, Key Pairs, Subnets, etc.
+
+CRITICAL INSTRUCTION 2: You MUST use boto3 paginators (e.g. `get_paginator`) for all list and describe operations to ensure that ALL resources are fetched across all pages. Failure to use paginators will result in missing resources.
 
 Ensure you only perform read-only actions (like describe_* or list_*). Do not use create, delete, update, put, or start/stop.
 Return ONLY the python code.
@@ -170,16 +172,23 @@ The function must accept:
 - `start_time`: datetime object (start of lookback window)
 - `end_time`: datetime object (end of lookback window)
 
-The function must call CloudWatch `get_metric_data` (or get_metric_statistics) to fetch historical datapoints at a daily granularity (Period=86400).
+The function must call CloudWatch `get_metric_data` to fetch historical datapoints at a daily granularity (Period=86400).
 It must parse the response and return a list of dictionaries with this exact schema:
 [
   {{
     "timestamp": "2026-07-08T00:00:00Z", # ISO string format
     "value": 15.4, # float value
     "metric_name": "CPUUtilization",
-    "unit": "Percent" # or relevant unit like Bytes, Count, etc.
+    "unit": "Percent" # or relevant unit like Bytes, Count, etc. Fallback to 'None' if missing.
   }}
 ]
+
+CRITICAL INSTRUCTIONS:
+1. ALWAYS use the `get_paginator("get_metric_data")` paginator to fetch data. Never rely on a single response as it might be truncated.
+2. For CloudWatch metric IDs in the queries, use a safe ID format (e.g., `f"m{{i}}"`) and maintain a mapping back to the metric name. Do not use the metric name directly as the ID, as CloudWatch imposes strict lowercase and character constraints.
+3. Choose the most appropriate 'Stat' for the metric (e.g., 'Sum' for Invocations/Errors/Throttles, 'Average' for CPUUtilization/Duration, 'Maximum' for ConcurrentExecutions). Do not blindly use 'Average' or 'Sum' for everything.
+4. Ensure all necessary modules (e.g., `from datetime import timedelta, timezone`) are imported if you perform date manipulations, but note that `start_time` and `end_time` are already provided as arguments. Do not use deprecated `datetime.utcnow()`.
+5. The `Unit` field in CloudWatch results may be None. You must handle `None` values safely.
 
 Ensure you only perform read-only actions (specifically get_metric_data). Ensure you handle potential empty results.
 Return ONLY the python code.
