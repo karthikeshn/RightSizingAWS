@@ -17,7 +17,7 @@ def init_metric_store_indices():
 # Initialize index right away
 init_metric_store_indices()
 
-def save_metric_points(config_id, resource_id, service_type, region, datapoints):
+def save_metric_points(account_id, resource_id, service_type, region, datapoints):
     """
     FR-8.1: Save time-series points.
     datapoints is a list of dicts: [{"timestamp": "...", "value": 1.2, "metric_name": "...", "unit": "..."}]
@@ -32,7 +32,7 @@ def save_metric_points(config_id, resource_id, service_type, region, datapoints)
     insert_data = []
     for dp in datapoints:
         insert_data.append((
-            config_id,
+            account_id,
             resource_id,
             service_type,
             region,
@@ -43,14 +43,14 @@ def save_metric_points(config_id, resource_id, service_type, region, datapoints)
         ))
         
     cursor.executemany("""
-        INSERT INTO metric_store (config_id, resource_id, service_type, region, metric_name, timestamp, value, unit)
+        INSERT INTO metric_store (account_id, resource_id, service_type, region, metric_name, timestamp, value, unit)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     """, insert_data)
     
     conn.commit()
     conn.close()
 
-def get_metric_points(config_id, resource_id, metric_name, start_time_str, end_time_str):
+def get_metric_points(account_id, resource_id, metric_name, start_time_str, end_time_str):
     """
     FR-8.3: Retrieve all metric points for resource X, metric Y, over date range Z.
     """
@@ -59,16 +59,16 @@ def get_metric_points(config_id, resource_id, metric_name, start_time_str, end_t
     
     cursor.execute("""
         SELECT timestamp, value, unit FROM metric_store
-        WHERE config_id = ? AND resource_id = ? AND metric_name = ? AND timestamp BETWEEN ? AND ?
+        WHERE account_id = ? AND resource_id = ? AND metric_name = ? AND timestamp BETWEEN ? AND ?
         ORDER BY timestamp ASC
-    """, (config_id, resource_id, metric_name, start_time_str, end_time_str))
+    """, (account_id, resource_id, metric_name, start_time_str, end_time_str))
     
     rows = cursor.fetchall()
     conn.close()
     
     return [dict(row) for row in rows]
 
-def get_metrics_for_resource(config_id, resource_id):
+def get_metrics_for_resource(account_id, resource_id):
     """
     Helper to list all distinct metric names stored for a resource.
     """
@@ -76,8 +76,8 @@ def get_metrics_for_resource(config_id, resource_id):
     cursor = conn.cursor()
     cursor.execute("""
         SELECT DISTINCT metric_name FROM metric_store
-        WHERE config_id = ? AND resource_id = ?
-    """, (config_id, resource_id))
+        WHERE account_id = ? AND resource_id = ?
+    """, (account_id, resource_id))
     rows = cursor.fetchall()
     conn.close()
     return [r['metric_name'] for r in rows]

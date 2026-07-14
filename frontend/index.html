@@ -334,6 +334,18 @@
                                 <button class="btn btn-success btn-block" id="run-pipeline-btn">
                                     Run Right-Sizing Pipeline
                                 </button>
+                                
+                                <div id="execution-progress-container" style="display: none; margin-top: 20px;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                        <span id="execution-progress-text" style="font-size: 0.9em; font-weight: 500;">0 of 0 regions completed</span>
+                                    </div>
+                                    <div class="progress-bar-bg" style="width: 100%; height: 8px; background-color: var(--card-bg-elevated); border-radius: 4px; overflow: hidden; margin-bottom: 15px;">
+                                        <div id="execution-progress-fill" style="height: 100%; width: 0%; background-color: var(--primary-color); transition: width 0.3s ease;"></div>
+                                    </div>
+                                    <ul id="execution-regions-list" style="list-style: none; padding: 0; margin: 0; font-size: 0.85em;">
+                                        <!-- Filled dynamically -->
+                                    </ul>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -494,6 +506,6 @@
     </div>
     
     <!-- JS application logic link -->
-    <script src="js/app.js?v=2"></script>
+    <script src="js/app.js?v=3"></script>
 </body>
 </html>

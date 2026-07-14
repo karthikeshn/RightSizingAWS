@@ -35,11 +35,11 @@ def filter_primary_resources(service_name, resources):
                 
     return filtered
 
-def execute_discovery(config_id, service_name, region):
+def execute_discovery(account_id, service_name, region):
     """
     FR-7.1: Executes approved Component A for the service/region.
     """
-    comp_a = get_latest_approved_component(config_id, service_name, "discovery")
+    comp_a = get_latest_approved_component(account_id, service_name, "discovery")
     if not comp_a:
         raise ValueError(f"No approved discovery code (Component A) found for service {service_name}")
     
@@ -55,7 +55,7 @@ def execute_discovery(config_id, service_name, region):
             raise ValueError("Function 'discover_resources' was not defined in the code.")
         
         # Instantiate our sandboxed read-only session
-        session = get_sandboxed_session(config_id)
+        session = get_sandboxed_session(account_id)
         
         # Execute discovery
         resources = discover_fn(session, region)
@@ -68,11 +68,11 @@ def execute_discovery(config_id, service_name, region):
         traceback.print_exc()
         raise RuntimeError(f"Execution Error: {e}")
 
-def execute_metric_fetching(config_id, service_name, region, resource_id, metrics, lookback_days=30):
+def execute_metric_fetching(account_id, service_name, region, resource_id, metrics, lookback_days=30):
     """
     FR-7.2: Executes approved Component C to fetch metrics.
     """
-    comp_c = get_latest_approved_component(config_id, service_name, "metric_fetching")
+    comp_c = get_latest_approved_component(account_id, service_name, "metric_fetching")
     if not comp_c:
         raise ValueError(f"No approved metric fetching code (Component C) found for service {service_name}")
         
@@ -86,7 +86,7 @@ def execute_metric_fetching(config_id, service_name, region, resource_id, metric
         if not fetch_fn:
             raise ValueError("Function 'fetch_metrics' was not defined in the code.")
             
-        session = get_sandboxed_session(config_id)
+        session = get_sandboxed_session(account_id)
         
         # Compute start and end times
         end_time = datetime.datetime.utcnow()
@@ -104,21 +104,44 @@ def execute_metric_fetching(config_id, service_name, region, resource_id, metric
         # FR-7.4: Log & return empty list so other resources/services continue
         return []
 
-def run_pipeline_for_service(config_id, service_name, region, lookback_days=30):
+def run_pipeline_for_service(account_id, service_name, region, lookback_days=30):
     """
     Orchestrate Module 7: Run resource discovery, then metric fetching for discovered resources,
     and persist results.
     """
     # 1. Discover resources
     try:
-        raw_resources = execute_discovery(config_id, service_name, region)
+        raw_resources = execute_discovery(account_id, service_name, region)
         resources = filter_primary_resources(service_name, raw_resources)
+        
+        # Persist discovered resources
+        now_str = datetime.datetime.utcnow().isoformat()
+        from src.db import get_db_connection
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        for r in resources:
+            cursor.execute("""
+                INSERT OR REPLACE INTO discovered_resources (
+                    resource_id, account_id, service_type, region, resource_type, metadata_json, discovery_date
+                ) VALUES (?, ?, ?, ?, ?, ?, ?)
+            """, (
+                r.get('id', ''),
+                account_id,
+                service_name,
+                region,
+                r.get('type', ''),
+                json.dumps(r.get('metadata', {})),
+                now_str
+            ))
+        conn.commit()
+        conn.close()
+
     except Exception as e:
         # If discovery fails completely for a service, log it but let others run (FR-7.4)
         return {"status": "failed", "error": f"Discovery failed: {e}", "resources": []}
     
     # 2. Get the metrics list (Component B)
-    comp_b = get_latest_approved_component(config_id, service_name, "metric_identification")
+    comp_b = get_latest_approved_component(account_id, service_name, "metric_identification")
     if not comp_b:
         return {"status": "failed", "error": "No approved metric identification config (Component B) found.", "resources": []}
     
@@ -141,7 +164,7 @@ def run_pipeline_for_service(config_id, service_name, region, lookback_days=30):
         try:
             # Execute metric fetch (gracefully handles errors inside)
             datapoints = execute_metric_fetching(
-                config_id=config_id,
+                account_id=account_id,
                 service_name=service_name,
                 region=region,
                 resource_id=res_id,
@@ -151,7 +174,7 @@ def run_pipeline_for_service(config_id, service_name, region, lookback_days=30):
             
             # Save metrics to store (Module 8)
             if datapoints:
-                save_metric_points(config_id, res_id, service_name, region, datapoints)
+                save_metric_points(account_id, res_id, service_name, region, datapoints)
                 
             processed_resources.append({
                 "id": res_id,

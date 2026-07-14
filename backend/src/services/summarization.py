@@ -37,7 +37,7 @@ def calculate_std_dev(values, mean):
     variance = sum((x - mean) ** 2 for x in values) / (N - 1)
     return math.sqrt(variance)
 
-def summarize_resource_metrics(config_id, resource_id, service_type, region, lookback_days=30):
+def summarize_resource_metrics(account_id, resource_id, service_type, region, lookback_days=30):
     """
     FR-9.1, FR-9.2: Computes statistics for a resource over the lookback window.
     """
@@ -47,7 +47,7 @@ def summarize_resource_metrics(config_id, resource_id, service_type, region, loo
     start_str = start_time.isoformat()
     end_str = end_time.isoformat()
     
-    metrics = get_metrics_for_resource(config_id, resource_id)
+    metrics = get_metrics_for_resource(account_id, resource_id)
     
     summary = {
         "resource_id": resource_id,
@@ -58,7 +58,7 @@ def summarize_resource_metrics(config_id, resource_id, service_type, region, loo
     }
     
     for metric_name in metrics:
-        points = get_metric_points(config_id, resource_id, metric_name, start_str, end_str)
+        points = get_metric_points(account_id, resource_id, metric_name, start_str, end_str)
         if not points:
             continue
             

@@ -13,22 +13,26 @@ def init_db():
     conn = get_db_connection()
     cursor = conn.cursor()
     
-    # Check if we need to migrate (if cloud_configs table doesn't exist but other tables do)
-    cursor.execute("  SELECT name FROM sqlite_master WHERE type='table' AND name='cloud_configs'")
-    if not cursor.fetchone():
-        # Drop old tables to force recreation with new schemas
-        cursor.execute("DROP TABLE IF EXISTS services_registry")
-        cursor.execute("DROP TABLE IF EXISTS code_repository")
-        cursor.execute("DROP TABLE IF EXISTS metric_store")
-        cursor.execute("DROP TABLE IF EXISTS resource_summaries")
+    # Migration to add status and last_verified_at to cloud_configs
+    cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='cloud_configs'")
+    if cursor.fetchone():
+        cursor.execute("PRAGMA table_info(cloud_configs)")
+        columns = [row['name'] for row in cursor.fetchall()]
+        
+        # In case the table is missing the original account_id migration, we handle it if needed
+        # But assuming it's already migrated (since config_id was missing), we just add new columns
+        if 'status' not in columns:
+            cursor.execute("ALTER TABLE cloud_configs ADD COLUMN status TEXT DEFAULT 'Connected'")
+        if 'last_verified_at' not in columns:
+            cursor.execute("ALTER TABLE cloud_configs ADD COLUMN last_verified_at TEXT")
         conn.commit()
     
     # 1. Cloud Configurations (Module 0)
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS cloud_configs (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            provider TEXT NOT NULL,
+            account_id TEXT PRIMARY KEY,
             account_name TEXT NOT NULL,
+            provider TEXT NOT NULL,
             region TEXT NOT NULL,
             use_iam_role BOOLEAN NOT NULL,
             access_key TEXT,
@@ -36,7 +40,8 @@ def init_db():
             session_token TEXT,
             assume_role_arn TEXT,
             external_id TEXT,
-            verified BOOLEAN NOT NULL DEFAULT 0
+            status TEXT DEFAULT 'Connected',
+            last_verified_at TEXT
         )
     """)
     
@@ -52,7 +57,7 @@ def init_db():
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS code_repository (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            config_id INTEGER,
+            account_id TEXT,
             service_name TEXT NOT NULL,
             component_type TEXT NOT NULL, -- 'discovery', 'metric_identification', 'metric_fetching'
             version INTEGER NOT NULL,
@@ -69,7 +74,7 @@ def init_db():
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS metric_store (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            config_id INTEGER,
+            account_id TEXT,
             resource_id TEXT NOT NULL,
             service_type TEXT NOT NULL,
             region TEXT NOT NULL,
@@ -84,14 +89,28 @@ def init_db():
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS resource_summaries (
             resource_id TEXT NOT NULL,
-            config_id INTEGER NOT NULL,
+            account_id TEXT NOT NULL,
             service_type TEXT NOT NULL,
             region TEXT NOT NULL,
             analysis_date TEXT NOT NULL,
             summary_json TEXT NOT NULL,
             recommendation TEXT NOT NULL, -- 'Upsize', 'Downsize', 'Keep Current', 'Specific Instance'
             explanation TEXT NOT NULL,
-            PRIMARY KEY (resource_id, config_id)
+            PRIMARY KEY (resource_id, account_id)
+        )
+    """)
+    
+    # 6. Discovered Resources
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS discovered_resources (
+            resource_id TEXT NOT NULL,
+            account_id TEXT NOT NULL,
+            service_type TEXT NOT NULL,
+            region TEXT NOT NULL,
+            resource_type TEXT NOT NULL,
+            metadata_json TEXT NOT NULL,
+            discovery_date TEXT NOT NULL,
+            PRIMARY KEY (resource_id, account_id)
         )
     """)
     

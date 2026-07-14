@@ -4,24 +4,24 @@ from src.llm_clients import generate_text
 from src.services.summarization import summarize_resource_metrics, format_summary_to_text
 from src.db import get_db_connection
 
-def generate_recommendation_for_resource(config_id, resource_id, service_type, region, resource_capacity_type="N/A", lookback_days=30, metadata=None):
+def generate_recommendation_for_resource(account_id, resource_id, service_type, region, resource_capacity_type="N/A", lookback_days=30, metadata=None):
     if metadata is None:
         metadata = {}
     """
     Module 10: Feeds statistical summary to the LLM and parses recommendations.
     """
     # 1. Gather stats summary
-    summary = summarize_resource_metrics(config_id, resource_id, service_type, region, lookback_days)
+    summary = summarize_resource_metrics(account_id, resource_id, service_type, region, lookback_days)
     if not summary or not summary.get("metrics"):
         now_str = datetime.datetime.utcnow().isoformat()
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute("""
             INSERT OR REPLACE INTO resource_summaries (
-                resource_id, config_id, service_type, region, analysis_date, summary_json, recommendation, explanation
+                resource_id, account_id, service_type, region, analysis_date, summary_json, recommendation, explanation
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         """, (
-            resource_id, config_id, service_type, region, now_str, 
+            resource_id, account_id, service_type, region, now_str, 
             json.dumps({"metrics": {}}), "Unknown", "No metrics available for this resource to analyze."
         ))
         conn.commit()
@@ -115,11 +115,11 @@ Your output must be a single, raw JSON object with the following keys. Do not in
     
     cursor.execute("""
         INSERT OR REPLACE INTO resource_summaries (
-            resource_id, config_id, service_type, region, analysis_date, summary_json, recommendation, explanation
+            resource_id, account_id, service_type, region, analysis_date, summary_json, recommendation, explanation
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     """, (
         resource_id,
-        config_id,
+        account_id,
         service_type,
         region,
         now_str,
@@ -141,7 +141,7 @@ Your output must be a single, raw JSON object with the following keys. Do not in
         "explanation": explanation
     }
 
-def get_saved_recommendations(config_id=None, service_name=None, region=None):
+def get_saved_recommendations(account_id=None, service_name=None, region=None):
     """
     FR-10.4: Allow viewing recommendations, optionally grouped/filtered.
     """
@@ -152,9 +152,9 @@ def get_saved_recommendations(config_id=None, service_name=None, region=None):
     params = []
     
     filters = []
-    if config_id is not None:
-        filters.append("config_id = ?")
-        params.append(config_id)
+    if account_id is not None:
+        filters.append("account_id = ?")
+        params.append(account_id)
     if service_name:
         filters.append("service_type = ?")
         params.append(service_name)

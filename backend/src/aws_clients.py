@@ -51,12 +51,12 @@ class ReadOnlySessionWrapper:
         # But if they use resource, wrap it or raise.
         raise NotImplementedError("Please use client API (e.g. session.client('ec2')) for read-only sandboxed runs.")
 
-def get_boto3_session(config_id=None):
-    if config_id is not None:
+def get_boto3_session(account_id=None):
+    if account_id is not None:
         from src.db import get_db_connection
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM cloud_configs WHERE id = ?", (config_id,))
+        cursor.execute("SELECT * FROM cloud_configs WHERE account_id = ?", (account_id,))
         row = cursor.fetchone()
         conn.close()
         
@@ -118,27 +118,27 @@ def get_boto3_session(config_id=None):
     # Fallback to default credentials chain
     return boto3.Session(region_name=region_name)
 
-def get_sandboxed_session(config_id=None):
-    return ReadOnlySessionWrapper(get_boto3_session(config_id))
+def get_sandboxed_session(account_id=None):
+    return ReadOnlySessionWrapper(get_boto3_session(account_id))
 
 # Module 1: Cost Explorer query helper
-def query_cost_explorer_services(lookback_days=30, config_id=None):
+def query_cost_explorer_services(lookback_days=30, account_id=None):
     region_name = "us-east-1"
-    if config_id is not None:
+    if account_id is not None:
         from src.db import get_db_connection
         conn = get_db_connection()
-        row = conn.execute("SELECT region FROM cloud_configs WHERE id = ?", (config_id,)).fetchone()
+        row = conn.execute("SELECT region FROM cloud_configs WHERE account_id = ?", (account_id,)).fetchone()
         conn.close()
         if row:
             region_name = row['region']
             
     try:
-        session = get_boto3_session(config_id)
+        session = get_boto3_session(account_id)
         # Skip calling Cost Explorer for mock configurations to prevent credentials error
-        if config_id is not None:
+        if account_id is not None:
             from src.db import get_db_connection
             conn = get_db_connection()
-            row = conn.execute("SELECT access_key, secret_key FROM cloud_configs WHERE id = ?", (config_id,)).fetchone()
+            row = conn.execute("SELECT access_key, secret_key FROM cloud_configs WHERE account_id = ?", (account_id,)).fetchone()
             conn.close()
             if row and (row['access_key'] == 'mock' or row['secret_key'] == 'mock'):
                 raise ValueError("Bypassing for mock config")

@@ -5,15 +5,16 @@ import datetime
 from fastapi import FastAPI, HTTPException, Query, Body
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, StreamingResponse
+import json
 from pydantic import BaseModel
 from typing import List, Optional
-
+from concurrent.futures import ThreadPoolExecutor, as_completed
 # Add the parent folder to path to resolve src imports properly
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.db import init_db
-from src.aws_clients import query_cost_explorer_services
+from src.aws_clients import query_cost_explorer_services, get_boto3_session
 from src.services.filtration import process_active_services, get_registry, update_registry_service
 from src.services.known_check import determine_service_status
 from src.services.repository import (
@@ -55,7 +56,7 @@ class RegistryUpdateSchema(BaseModel):
     supports_right_sizing: bool
 
 class CodeGenRequestSchema(BaseModel):
-    config_id: int
+    account_id: str
     service_name: str
 
 class CodeReviewRequestSchema(BaseModel):
@@ -65,7 +66,7 @@ class CodeReviewRequestSchema(BaseModel):
     override_code: Optional[str] = None
 
 class RunPipelineRequestSchema(BaseModel):
-    config_id: int
+    account_id: str
     service_name: str
     regions: List[str]
     lookback_days: Optional[int] = 30
@@ -73,12 +74,56 @@ class RunPipelineRequestSchema(BaseModel):
 
 # --- API Routes ---
 
+def validate_aws_credentials(account_id: str) -> dict:
+    from src.db import get_db_connection
+    import botocore
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT access_key, secret_key FROM cloud_configs WHERE account_id = ?", (account_id,))
+    row = cursor.fetchone()
+    
+    if not row:
+        conn.close()
+        raise HTTPException(status_code=404, detail="Cloud config not found")
+        
+    if row['access_key'] == 'mock' or row['secret_key'] == 'mock':
+        status = "Connected"
+    else:
+        try:
+            session = get_boto3_session(account_id)
+            sts = session.client('sts')
+            sts.get_caller_identity()
+            status = "Connected"
+        except botocore.exceptions.ClientError as e:
+            error_code = e.response.get('Error', {}).get('Code', 'Unknown')
+            if error_code in ['ExpiredToken', 'ExpiredTokenException']:
+                status = "Credentials Expired"
+            elif error_code in ['AuthFailure', 'InvalidClientTokenId', 'AccessDenied']:
+                status = "Invalid Credentials"
+            else:
+                status = "Connection Failed"
+        except Exception as e:
+            status = "Connection Failed"
+            
+    now = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    cursor.execute("UPDATE cloud_configs SET status = ?, last_verified_at = ? WHERE account_id = ?", (status, now, account_id))
+    conn.commit()
+    conn.close()
+    
+    return {"status": status, "last_verified_at": now}
+
 @app.get("/api/discovery/active-services")
-def get_active_services(config_id: Optional[int] = Query(None), lookback_days: int = 30):
+def get_active_services(account_id: Optional[str] = Query(None), lookback_days: int = 30):
     """
     Module 1 & 2: Cost Explorer discovery filtered against the registry.
     """
-    raw_ce_results = query_cost_explorer_services(lookback_days, config_id)
+    if account_id:
+        val_result = validate_aws_credentials(account_id)
+        if val_result["status"] != "Connected":
+            raise HTTPException(status_code=403, detail=f"Credential validation failed: {val_result['status']}")
+
+    raw_ce_results = query_cost_explorer_services(lookback_days, account_id)
     all_services = process_active_services(raw_ce_results)
     
     # Enrich with Known/New status based on mapping
@@ -91,12 +136,12 @@ def get_active_services(config_id: Optional[int] = Query(None), lookback_days: i
     }
 
 @app.get("/api/services/summary")
-def get_services_summary(config_id: Optional[int] = Query(None), lookback_days: int = 30):
+def get_services_summary(account_id: Optional[str] = Query(None), lookback_days: int = 30):
     """
     Returns an aggregated summary of active, supported services from Cost Explorer
     merged with DB statistics (resources count, candidates count, region breakdown).
     """
-    raw_ce_results = query_cost_explorer_services(lookback_days, config_id)
+    raw_ce_results = query_cost_explorer_services(lookback_days, account_id)
     all_services = process_active_services(raw_ce_results)
     filtered = [s for s in all_services if s['is_known']]
     
@@ -104,16 +149,16 @@ def get_services_summary(config_id: Optional[int] = Query(None), lookback_days: 
     conn = get_db_connection()
     cursor = conn.cursor()
     
-    # Fetch global resource counts and candidate counts scoped by config_id
-    if config_id is not None:
+    # Fetch global resource counts and candidate counts scoped by account_id
+    if account_id is not None:
         cursor.execute("""
             SELECT service_type, 
                    COUNT(*) as total_resources,
                    SUM(CASE WHEN recommendation NOT LIKE 'Keep Current%' THEN 1 ELSE 0 END) as total_candidates
             FROM resource_summaries
-            WHERE config_id = ?
+            WHERE account_id = ?
             GROUP BY service_type
-        """, (config_id,))
+        """, (account_id,))
     else:
         cursor.execute("""
             SELECT service_type, 
@@ -124,16 +169,16 @@ def get_services_summary(config_id: Optional[int] = Query(None), lookback_days: 
         """)
     db_totals = {row['service_type']: (row['total_resources'], row['total_candidates']) for row in cursor.fetchall()}
     
-    # Fetch region-specific counts scoped by config_id
-    if config_id is not None:
+    # Fetch region-specific counts scoped by account_id
+    if account_id is not None:
         cursor.execute("""
             SELECT service_type, region,
                    COUNT(*) as res_count,
                    SUM(CASE WHEN recommendation NOT LIKE 'Keep Current%' THEN 1 ELSE 0 END) as cand_count
             FROM resource_summaries
-            WHERE config_id = ?
+            WHERE account_id = ?
             GROUP BY service_type, region
-        """, (config_id,))
+        """, (account_id,))
     else:
         cursor.execute("""
             SELECT service_type, region,
@@ -164,7 +209,7 @@ def get_services_summary(config_id: Optional[int] = Query(None), lookback_days: 
         if sname not in services_map:
             services_map[sname] = {
                 "service_name": sname,
-                "status": determine_service_status(config_id, sname),
+                "status": determine_service_status(account_id, sname),
                 "total_cost": 0.0,
                 "regions_data": {} # region -> cost
               }
@@ -176,7 +221,7 @@ def get_services_summary(config_id: Optional[int] = Query(None), lookback_days: 
         if sname not in services_map:
             services_map[sname] = {
                 "service_name": sname,
-                "status": determine_service_status(config_id, sname),
+                "status": determine_service_status(account_id, sname),
                 "total_cost": 0.0,
                 "regions_data": {}
             }
@@ -240,8 +285,8 @@ def get_configs():
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("""
-        SELECT id, provider, account_name, region, use_iam_role, 
-               access_key, session_token, assume_role_arn, external_id, verified 
+        SELECT account_id as id, provider, account_name, region, use_iam_role, 
+               access_key, session_token, assume_role_arn, external_id, status, last_verified_at 
         FROM cloud_configs
     """)
     rows = cursor.fetchall()
@@ -253,117 +298,105 @@ def create_config(data: CloudConfigCreateSchema):
     """
     Register a new cloud configuration.
     """
-    from src.db import get_db_connection
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("""
-        INSERT INTO cloud_configs (
-            provider, account_name, region, use_iam_role, access_key, secret_key, session_token, assume_role_arn, external_id, verified
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0)
-    """, (
-        data.provider, data.account_name, data.region, data.use_iam_role,
-        data.access_key, data.secret_key, data.session_token, data.assume_role_arn, data.external_id
-    ))
-    conn.commit()
-    new_id = cursor.lastrowid
-    conn.close()
-    return {"message": "Cloud config created.", "id": new_id}
-
-@app.delete("/api/config/{config_id}")
-def delete_config(config_id: int):
-    """
-    Delete a cloud configuration.
-    """
-    from src.db import get_db_connection
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("DELETE FROM cloud_configs WHERE id = ?", (config_id,))
-    conn.commit()
-    conn.close()
-    return {"message": f"Cloud config {config_id} deleted."}
-
-@app.post("/api/config/{config_id}/verify")
-def verify_config(config_id: int):
-    """
-    Test AWS connection for the configuration and set verified status.
-    """
-    from src.db import get_db_connection
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM cloud_configs WHERE id = ?", (config_id,))
-    row = cursor.fetchone()
-    if not row:
-        conn.close()
-        raise HTTPException(status_code=404, detail="Config not found.")
-        
-    provider = row['provider']
-    region = row['region']
-    use_iam_role = row['use_iam_role']
-    access_key = row['access_key']
-    secret_key = row['secret_key']
-    session_token = row['session_token']
-    assume_role_arn = row['assume_role_arn']
-    external_id = row['external_id']
-    conn.close()
-    
+    # Fetch AWS Account ID immediately
+    import boto3
     try:
-        import boto3
-        # Direct success bypass for mock credentials
-        if access_key == 'mock' or secret_key == 'mock':
-            success, message = True, "Verified successfully (Mock Mode)"
+        if data.access_key == 'mock' or data.secret_key == 'mock':
+            account_id = "mock-account"
         else:
-            if use_iam_role:
-                session = boto3.Session(region_name=region)
+            if data.use_iam_role:
+                session = boto3.Session(region_name=data.region)
             else:
                 session = boto3.Session(
-                    aws_access_key_id=access_key,
-                    aws_secret_access_key=secret_key,
-                    aws_session_token=session_token,
-                    region_name=region
+                    aws_access_key_id=data.access_key,
+                    aws_secret_access_key=data.secret_key,
+                    aws_session_token=data.session_token,
+                    region_name=data.region
                 )
-                
-            if assume_role_arn:
+            if data.assume_role_arn:
                 sts = session.client('sts')
                 assume_kwargs = {
-                    'RoleArn': assume_role_arn,
+                    'RoleArn': data.assume_role_arn,
                     'RoleSessionName': 'VerificationSession'
                 }
-                if external_id:
-                    assume_kwargs['ExternalId'] = external_id
+                if data.external_id:
+                    assume_kwargs['ExternalId'] = data.external_id
                 assumed = sts.assume_role(**assume_kwargs)
                 credentials = assumed['Credentials']
                 session = boto3.Session(
                     aws_access_key_id=credentials['AccessKeyId'],
                     aws_secret_access_key=credentials['SecretAccessKey'],
                     aws_session_token=credentials['SessionToken'],
-                    region_name=region
+                    region_name=data.region
                 )
-                
             sts = session.client('sts')
             identity = sts.get_caller_identity()
-            success, message = True, f"Verified as {identity.get('Arn')}"
+            account_id = identity.get('Account')
     except Exception as e:
-        success, message = False, str(e)
+        raise HTTPException(status_code=400, detail=f"Failed to verify credentials with STS: {e}")
         
+    from src.db import get_db_connection
     conn = get_db_connection()
-    if success:
-        conn.execute("UPDATE cloud_configs SET verified = 1 WHERE id = ?", (config_id,))
-        conn.commit()
-        conn.close()
-        return {"status": "success", "message": message}
+    cursor = conn.cursor()
+    
+    # Check if account_id already exists
+    cursor.execute("SELECT account_id FROM cloud_configs WHERE account_id = ?", (account_id,))
+    if cursor.fetchone():
+        cursor.execute("""
+            UPDATE cloud_configs SET
+                provider = ?, account_name = ?, region = ?, use_iam_role = ?,
+                access_key = ?, secret_key = ?, session_token = ?, assume_role_arn = ?, external_id = ?, status = 'Connected', last_verified_at = ?
+            WHERE account_id = ?
+        """, (
+            data.provider, data.account_name, data.region, data.use_iam_role,
+            data.access_key, data.secret_key, data.session_token, data.assume_role_arn, data.external_id, datetime.datetime.now(datetime.timezone.utc).isoformat(),
+            account_id
+        ))
+        msg = "Cloud config updated for account."
     else:
-        conn.execute("UPDATE cloud_configs SET verified = 0 WHERE id = ?", (config_id,))
-        conn.commit()
-        conn.close()
-        raise HTTPException(status_code=400, detail=f"Verification failed: {message}")
+        cursor.execute("""
+            INSERT INTO cloud_configs (
+                account_id, provider, account_name, region, use_iam_role, access_key, secret_key, session_token, assume_role_arn, external_id, status, last_verified_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Connected', ?)
+        """, (
+            account_id, data.provider, data.account_name, data.region, data.use_iam_role,
+            data.access_key, data.secret_key, data.session_token, data.assume_role_arn, data.external_id, datetime.datetime.now(datetime.timezone.utc).isoformat()
+        ))
+        msg = "Cloud config created."
+        
+    conn.commit()
+    conn.close()
+    return {"message": msg, "id": account_id}
+
+@app.post("/api/config/{account_id}/validate")
+def validate_config(account_id: str):
+    """
+    Manually validate AWS credentials.
+    """
+    return validate_aws_credentials(account_id)
+
+@app.delete("/api/config/{account_id}")
+def delete_config(account_id: str):
+    """
+    Delete a cloud configuration.
+    """
+    from src.db import get_db_connection
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM cloud_configs WHERE account_id = ?", (account_id,))
+    conn.commit()
+    conn.close()
+    return {"message": f"Cloud config {account_id} deleted."}
+
+
 
 
 @app.get("/api/code/status")
-def get_code_status_summary(config_id: Optional[int] = Query(None)):
+def get_code_status_summary(account_id: Optional[str] = Query(None)):
     """
     Returns the code version and review status for each service.
     """
-    return get_all_services_code_status(config_id)
+    return get_all_services_code_status(account_id)
 
 @app.post("/api/code/generate")
 def generate_service_code(data: CodeGenRequestSchema):
@@ -372,7 +405,7 @@ def generate_service_code(data: CodeGenRequestSchema):
     Saves them as pending_review version 1.
     """
     service = data.service_name
-    config_id = data.config_id
+    account_id = data.account_id
     
     try:
         # Generate discovery
@@ -383,9 +416,9 @@ def generate_service_code(data: CodeGenRequestSchema):
         code_c = generate_component_c(service)
         
         # Save to DB as pending_review
-        _, id_a = save_code_version(config_id, service, "discovery", code_a, "pending_review", "AI-Generator")
-        _, id_b = save_code_version(config_id, service, "metric_identification", code_b, "pending_review", "AI-Generator")
-        _, id_c = save_code_version(config_id, service, "metric_fetching", code_c, "pending_review", "AI-Generator")
+        _, id_a = save_code_version(account_id, service, "discovery", code_a, "pending_review", "AI-Generator")
+        _, id_b = save_code_version(account_id, service, "metric_identification", code_b, "pending_review", "AI-Generator")
+        _, id_c = save_code_version(account_id, service, "metric_fetching", code_c, "pending_review", "AI-Generator")
         
         return {
             "service_name": service,
@@ -401,13 +434,13 @@ def generate_service_code(data: CodeGenRequestSchema):
         raise HTTPException(status_code=500, detail=f"Code generation failed: {e}")
 
 @app.get("/api/code/history/{service_name}/{component_type}")
-def get_code_history(service_name: str, component_type: str, config_id: Optional[int] = Query(None)):
+def get_code_history(service_name: str, component_type: str, account_id: Optional[str] = Query(None)):
     """
     Module 5: Returns the complete audit version history for a service component.
     """
     if component_type not in ["discovery", "metric_identification", "metric_fetching"]:
         raise HTTPException(status_code=400, detail="Invalid component type.")
-    return get_component_history(config_id, service_name, component_type)
+    return get_component_history(account_id, service_name, component_type)
 
 @app.post("/api/code/review")
 def review_service_code(data: CodeReviewRequestSchema):
@@ -437,66 +470,90 @@ def run_service_execution(data: RunPipelineRequestSchema):
     """
     Module 7, 8, 9, 10: Run the right-sizing pipeline for a service and region.
     """
+    # Verify credentials first
+    val_result = validate_aws_credentials(data.account_id)
+    if val_result["status"] != "Connected":
+        raise HTTPException(
+            status_code=403, 
+            detail=f"Credential validation failed: {val_result['status']}. Please update your credentials."
+        )
+
     # Verify the code is approved first
-    status = determine_service_status(data.config_id, data.service_name)
+    status = determine_service_status(data.account_id, data.service_name)
     if status != "Known":
         raise HTTPException(
             status_code=400, 
             detail=f"Service {data.service_name} has unapproved components. Approve code before running execution."
         )
+
+    def process_region(region):
+        region_recommendations = []
+        # Run execution pipeline (discovers resources, fetches metrics, saves to store)
+        result = run_pipeline_for_service(
+            account_id=data.account_id,
+            service_name=data.service_name,
+            region=region,
+            lookback_days=data.lookback_days
+        )
         
-    try:
-        total_resources_analyzed = 0
-        all_recommendations = []
+        if result["status"] == "failed":
+            raise Exception(result.get('error', 'Unknown error'))
+            
+        resources_analyzed = len(result["resources"])
         
-        for region in data.regions:
-            # Run execution pipeline (discovers resources, fetches metrics, saves to store)
-            result = run_pipeline_for_service(
-                config_id=data.config_id,
-                service_name=data.service_name,
+        # Run recommendations for each successfully processed resource
+        for res in result["resources"]:
+            # Generate recommendations
+            rec_result = generate_recommendation_for_resource(
+                account_id=data.account_id,
+                resource_id=res["id"],
+                service_type=data.service_name,
                 region=region,
-                lookback_days=data.lookback_days
+                resource_capacity_type=res["type"],
+                lookback_days=data.lookback_days,
+                metadata=res.get("metadata", {})
             )
+            region_recommendations.append(rec_result)
             
-            if result["status"] == "failed":
-                # For multiple regions, one might fail while others succeed. 
-                # Let's raise an error for now, or we could collect errors.
-                # Assuming failing the whole request is safest to alert the user.
-                raise HTTPException(status_code=500, detail=f"Execution failed in region {region}: {result['error']}")
-                
-            total_resources_analyzed += len(result["resources"])
+        return region, resources_analyzed, region_recommendations
+
+    def execution_generator():
+        yield json.dumps({"type": "start", "regions": data.regions}) + "\n"
+        
+        total_resources_analyzed = 0
+        max_workers = int(os.environ.get("MAX_WORKERS", 5))
+        
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            future_to_region = {executor.submit(process_region, region): region for region in data.regions}
             
-            # Run recommendations for each successfully processed resource
-            for res in result["resources"]:
-                # Generate recommendations
-                rec_result = generate_recommendation_for_resource(
-                    config_id=data.config_id,
-                    resource_id=res["id"],
-                    service_type=data.service_name,
-                    region=region,
-                    resource_capacity_type=res["type"],
-                    lookback_days=data.lookback_days,
-                    metadata=res.get("metadata", {})
-                )
-                all_recommendations.append(rec_result)
-                
-        return {
-            "service_name": data.service_name,
-            "regions": data.regions,
-            "resources_analyzed": total_resources_analyzed,
-            "recommendations": all_recommendations
-        }
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Pipeline execution failed: {e}")
+            for future in as_completed(future_to_region):
+                region = future_to_region[future]
+                try:
+                    _, resources_analyzed, _ = future.result()
+                    total_resources_analyzed += resources_analyzed
+                    yield json.dumps({
+                        "type": "region_success", 
+                        "region": region, 
+                        "resources_analyzed": resources_analyzed
+                    }) + "\n"
+                except Exception as exc:
+                    print(f"Region {region} generated an exception: {exc}")
+                    yield json.dumps({
+                        "type": "region_error", 
+                        "region": region, 
+                        "error": str(exc)
+                    }) + "\n"
+
+        yield json.dumps({"type": "complete", "total_resources": total_resources_analyzed}) + "\n"
+
+    return StreamingResponse(execution_generator(), media_type="application/x-ndjson")
 
 @app.get("/api/recommendations")
-def get_recommendations(config_id: Optional[int] = Query(None), service_name: Optional[str] = None, region: Optional[str] = None):
+def get_recommendations(account_id: Optional[str] = Query(None), service_name: Optional[str] = None, region: Optional[str] = None):
     """
     Module 10: Fetch list of recommendations, optionally filtered.
     """
-    return get_saved_recommendations(config_id, service_name, region)
+    return get_saved_recommendations(account_id, service_name, region)
 
 # --- Static Front-End Server ---
 

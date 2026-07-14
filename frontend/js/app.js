@@ -8,7 +8,7 @@ let currentReviewComponents = {};
 let activeReviewCompTab = "discovery";
 let chartsInstances = {};
 let cloudConfigs = [];
-let activeConfigId = null;
+let activeAccountId = null;
 let globalActiveServices = [];
 
 // On Page Load
@@ -140,14 +140,21 @@ function initBillingScan() {
 
 async function fetchBillingServices() {
     const listContainer = document.getElementById("active-services-list");
-    if (activeConfigId === null) {
+    if (activeAccountId === null) {
         listContainer.innerHTML = `<p class="card-desc">Select or add a verified Cloud Configuration to begin.</p>`;
         return;
     }
     
     try {
-        const response = await fetch(`${API_BASE}/discovery/active-services?config_id=${activeConfigId}`);
-        if (!response.ok) throw new Error("Failed to scan services.");
+        const response = await fetch(`${API_BASE}/discovery/active-services?account_id=${activeAccountId}`);
+        if (!response.ok) {
+            if (response.status === 403) {
+                const errData = await response.json();
+                loadConfigs(); // To update UI status globally
+                throw new Error(errData.detail || "Credentials expired or invalid.");
+            }
+            throw new Error("Failed to scan services.");
+        }
         
         const data = await response.json();
         const active = data.active_services || [];
@@ -293,13 +300,13 @@ async function fetchRecommendations() {
     const listContainer = document.getElementById("recommendations-list");
     const serviceFilter = document.getElementById("filter-service-select").value;
     
-    if (activeConfigId === null) {
+    if (activeAccountId === null) {
         listContainer.innerHTML = `<p class="card-desc">Select or add a verified Cloud Configuration to begin.</p>`;
         return;
     }
     
     try {
-        let url = `${API_BASE}/recommendations?config_id=${activeConfigId}`;
+        let url = `${API_BASE}/recommendations?account_id=${activeAccountId}`;
         if (serviceFilter) {
             url += `&service_name=${serviceFilter}`;
         }
@@ -602,10 +609,10 @@ function initCodeReviewSelector() {
 }
 
 async function checkCodeStatus() {
-    if (!currentReviewService || activeConfigId === null) return;
+    if (!currentReviewService || activeAccountId === null) return;
     
     try {
-        const response = await fetch(`${API_BASE}/code/status?config_id=${activeConfigId}`);
+        const response = await fetch(`${API_BASE}/code/status?account_id=${activeAccountId}`);
         if (!response.ok) throw new Error();
         
         const data = await response.json();
@@ -679,7 +686,7 @@ async function fetchCodeComponents(service, componentsInfo) {
         const comp = componentsInfo[ctype];
         
         // Fetch code content via history list (gets the latest)
-        const response = await fetch(`${API_BASE}/code/history/${service}/${ctype}?config_id=${activeConfigId}`);
+        const response = await fetch(`${API_BASE}/code/history/${service}/${ctype}?account_id=${activeAccountId}`);
         if (response.ok) {
             const history = await response.json();
             if (history.length > 0) {
@@ -733,7 +740,7 @@ async function generateAICode() {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ 
-                config_id: activeConfigId,
+                account_id: activeAccountId,
                 service_name: currentReviewService 
             })
         });
@@ -814,7 +821,7 @@ async function executePipeline() {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                config_id: activeConfigId,
+                account_id: activeAccountId,
                 service_name: currentReviewService,
                 regions: regions,
                 lookback_days: lookback
@@ -822,17 +829,87 @@ async function executePipeline() {
         });
         
         if (!response.ok) {
+            if (response.status === 403) {
+                const errData = await response.json();
+                loadConfigs(); // To update UI status globally
+                throw new Error(errData.detail || "Credentials expired or invalid.");
+            }
             const errData = await response.json();
             throw new Error(errData.detail || "Pipeline run encountered a runtime error.");
         }
         
-        const data = await response.json();
-        showToast(`Execution finished! Analyzed ${data.resources_analyzed} resources.`, "success");
+        const progressContainer = document.getElementById("execution-progress-container");
+        const progressText = document.getElementById("execution-progress-text");
+        const progressFill = document.getElementById("execution-progress-fill");
+        const regionsList = document.getElementById("execution-regions-list");
         
-        // Auto-navigate to Dashboard tab to review recommendations
-        setTimeout(() => {
-            document.querySelector('.nav-item[data-tab="dashboard"]').click();
-        }, 1000);
+        progressContainer.style.display = "block";
+        progressText.textContent = `0 of ${regions.length} regions completed`;
+        progressFill.style.width = "0%";
+        regionsList.innerHTML = "";
+        
+        regions.forEach(r => {
+            const li = document.createElement("li");
+            li.id = `exec-region-${r}`;
+            li.style.padding = "4px 0";
+            li.innerHTML = `<span style="color: var(--text-muted);">⏸</span> ${r} - <span style="color: var(--text-muted);">Pending</span>`;
+            regionsList.appendChild(li);
+        });
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder("utf-8");
+        let buffer = "";
+        let completedCount = 0;
+        
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split('\\n');
+            buffer = lines.pop();
+            
+            for (const line of lines) {
+                if (line.trim()) {
+                    const event = JSON.parse(line);
+                    
+                    if (event.type === "start") {
+                        event.regions.forEach(r => {
+                            const li = document.getElementById(`exec-region-${r}`);
+                            if (li) {
+                                li.innerHTML = `<span style="color: var(--primary-color);">🔄</span> ${r} - <span style="color: var(--primary-color);">Running...</span>`;
+                            }
+                        });
+                    } else if (event.type === "region_success") {
+                        completedCount++;
+                        const li = document.getElementById(`exec-region-${event.region}`);
+                        if (li) {
+                            li.innerHTML = `<span style="color: var(--success-color);">✅</span> ${event.region} - <span style="color: var(--success-color);">Completed (${event.resources_analyzed} resources)</span>`;
+                        }
+                        progressText.textContent = `${completedCount} of ${regions.length} regions completed`;
+                        progressFill.style.width = `${(completedCount / regions.length) * 100}%`;
+                        
+                        // Immediately fetch recommendations if we are on dashboard or even silently
+                        fetchRecommendations();
+                        
+                    } else if (event.type === "region_error") {
+                        completedCount++;
+                        const li = document.getElementById(`exec-region-${event.region}`);
+                        if (li) {
+                            li.innerHTML = `<span style="color: var(--error-color);">❌</span> ${event.region} - <span style="color: var(--error-color);">Failed: ${event.error}</span>`;
+                        }
+                        progressText.textContent = `${completedCount} of ${regions.length} regions completed`;
+                        progressFill.style.width = `${(completedCount / regions.length) * 100}%`;
+                        
+                    } else if (event.type === "complete") {
+                        showToast(`Execution finished! Analyzed ${event.total_resources} resources.`, "success");
+                        setTimeout(() => {
+                            document.querySelector('.nav-item[data-tab="dashboard"]').click();
+                        }, 1000);
+                    }
+                }
+            }
+        }
         
     } catch (err) {
         showToast(err.message, "error");
@@ -863,7 +940,7 @@ async function fetchHistoryVersions() {
     if (!service || !component) return;
     
     try {
-        const response = await fetch(`${API_BASE}/code/history/${service}/${component}?config_id=${activeConfigId}`);
+        const response = await fetch(`${API_BASE}/code/history/${service}/${component}?account_id=${activeAccountId}`);
         if (!response.ok) throw new Error();
         
         const list = await response.json();
@@ -1033,7 +1110,7 @@ let selectedServiceRowName = "";
 async function fetchServicesSummary() {
     const listContainer = document.getElementById("services-master-list");
     if (!listContainer) return;
-    if (activeConfigId === null) {
+    if (activeAccountId === null) {
         listContainer.innerHTML = `<p class="card-desc" style="padding: 20px;">Select or add a verified Cloud Configuration to begin.</p>`;
         return;
     }
@@ -1046,7 +1123,7 @@ async function fetchServicesSummary() {
             </div>
         `;
 
-        const response = await fetch(`${API_BASE}/services/summary?config_id=${activeConfigId}`);
+        const response = await fetch(`${API_BASE}/services/summary?account_id=${activeAccountId}`);
         if (!response.ok) throw new Error("Failed to fetch services summary.");
 
         const data = await response.json();
@@ -1262,7 +1339,12 @@ function initCloudConfig() {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload)
         })
-        .then(res => res.json())
+        .then(res => {
+            if (!res.ok) {
+                return res.json().then(err => { throw new Error(err.detail || "Validation failed") });
+            }
+            return res.json();
+        })
         .then(data => {
             showToast("Cloud configuration registered successfully.", "success");
             formCard.style.display = "none";
@@ -1279,7 +1361,7 @@ function initCloudConfig() {
     // Active config selection change
     activeConfigSelect.addEventListener("change", () => {
         const val = activeConfigSelect.value;
-        activeConfigId = val ? parseInt(val) : null;
+        activeAccountId = val ? val : null;
         
         // Trigger updates in current view
         refreshCurrentTab();
@@ -1295,17 +1377,17 @@ function loadConfigs() {
         populateActiveConfigSelect();
         
         // Check if there is an active verified config. If not, prompt.
-        const verifiedConfigs = cloudConfigs.filter(c => c.verified === 1);
+
         
-        if (verifiedConfigs.length > 0) {
+        if (cloudConfigs.length > 0) {
             // Auto-select first verified config if current selection is invalid
-            const currentIsValid = verifiedConfigs.some(c => c.id === activeConfigId);
+            const currentIsValid = cloudConfigs.some(c => c.id === activeAccountId);
             if (!currentIsValid) {
-                activeConfigId = verifiedConfigs[0].id;
-                document.getElementById("active-config-select").value = activeConfigId;
+                activeAccountId = cloudConfigs[0].id;
+                document.getElementById("active-config-select").value = activeAccountId;
             }
         } else {
-            activeConfigId = null;
+            activeAccountId = null;
             document.getElementById("active-config-select").value = "";
         }
         
@@ -1320,7 +1402,7 @@ function loadConfigs() {
 function checkConfigStateAndBlock() {
     const mainContent = document.querySelector("main.content");
     const noConfigEmptyState = document.getElementById("global-no-config-empty-state");
-    const verifiedConfigs = cloudConfigs.filter(c => c.verified === 1);
+
     
     // Clear any inline styles that were manually set on tab panes
     document.querySelectorAll(".tab-pane").forEach(p => {
@@ -1333,7 +1415,7 @@ function checkConfigStateAndBlock() {
         return;
     }
     
-    if (verifiedConfigs.length === 0) {
+    if (cloudConfigs.length === 0) {
         if (mainContent) mainContent.classList.add("no-config-blocked");
         if (noConfigEmptyState) noConfigEmptyState.style.display = "block";
     } else {
@@ -1344,11 +1426,11 @@ function checkConfigStateAndBlock() {
 
 function refreshCurrentTab() {
     checkConfigStateAndBlock();
-    if (cloudConfigs.filter(c => c.verified === 1).length === 0 && activeTab !== "config") {
+    if (cloudConfigs.length === 0 && activeTab !== "config") {
         return;
     }
     
-    // Normal tab refreshes passing activeConfigId
+    // Normal tab refreshes passing activeAccountId
     if (activeTab === "dashboard") {
         fetchBillingServices();
         fetchRecommendations();
@@ -1365,21 +1447,19 @@ function populateActiveConfigSelect() {
     const select = document.getElementById("active-config-select");
     select.innerHTML = "";
     
-    const verifiedConfigs = cloudConfigs.filter(c => c.verified === 1);
-    
-    if (verifiedConfigs.length === 0) {
+    if (cloudConfigs.length === 0) {
         const opt = document.createElement("option");
         opt.value = "";
-        opt.textContent = "No Verified Configs";
+        opt.textContent = "No Cloud Configs";
         select.appendChild(opt);
         return;
     }
     
-    verifiedConfigs.forEach(c => {
+    cloudConfigs.forEach(c => {
         const opt = document.createElement("option");
         opt.value = c.id;
         opt.textContent = `${c.account_name} (${c.region})`;
-        if (c.id === activeConfigId) {
+        if (c.id === activeAccountId) {
             opt.selected = true;
         }
         select.appendChild(opt);
@@ -1403,25 +1483,40 @@ function renderConfigsList() {
         const card = document.createElement("div");
         card.className = "config-item-card";
         
-        const isVerified = c.verified === 1;
-        const badgeClass = isVerified ? "badge-success" : "badge-secondary";
-        const badgeLabel = isVerified ? "Verified" : "Unverified";
+        const badgeLabel = c.status || "Checking";
+        let badgeClass = "badge-pending";
+        let iconClass = "";
+        
+        if (badgeLabel === "Connected") {
+            badgeClass = "badge-success";
+            iconClass = "verified";
+        } else if (badgeLabel === "Credentials Expired" || badgeLabel === "Invalid Credentials" || badgeLabel === "Connection Failed") {
+            badgeClass = "badge-danger";
+            iconClass = "error";
+        } else {
+            badgeClass = "badge-warning"; // Checking
+            iconClass = "pending";
+        }
+
+        let verifiedAtStr = c.last_verified_at ? new Date(c.last_verified_at).toLocaleString() : "Never";
         
         card.innerHTML = `
             <div class="config-item-left">
-                <div class="config-item-icon ${isVerified ? 'verified' : ''}">
+                <div class="config-item-icon ${iconClass}">
                     <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
                 </div>
                 <div class="config-item-info">
                     <div class="config-item-name" style="font-weight: 600;">${c.account_name}</div>
                     <div class="config-item-status-row" style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
-                        <span class="config-item-meta" style="font-size: 0.8rem; color: var(--text-muted);">${c.provider} &bull; ${c.region}</span>
-                        <span class="status-badge ${badgeClass}" style="padding: 2px 8px; font-size: 0.7rem; border-radius: 4px;">${badgeLabel}</span>
+                        <span class="config-item-meta" style="font-size: 0.8rem; color: var(--text-muted);">${c.provider} &bull; ID: ${c.id} &bull; ${c.region} &bull; Last Verified: ${verifiedAtStr}</span>
+                        <span class="status-badge ${badgeClass}" id="badge-${c.id}" style="padding: 2px 8px; font-size: 0.7rem; border-radius: 4px;">${badgeLabel}</span>
                     </div>
                 </div>
             </div>
             <div class="config-item-actions" style="display: flex; align-items: center; gap: 12px;">
-                <button class="config-verify-link" data-id="${c.id}">${isVerified ? 'Re-Verify' : 'Verify'}</button>
+                <button class="config-refresh-btn" data-id="${c.id}" title="Refresh Status">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                </button>
                 <button class="config-delete-btn" data-id="${c.id}" title="Delete configuration">
                     <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
                 </button>
@@ -1429,35 +1524,36 @@ function renderConfigsList() {
         `;
         
         // Add event listeners
-        card.querySelector(".config-verify-link").addEventListener("click", () => verifyConfigAccount(c.id));
+        
+        card.querySelector(".config-refresh-btn").addEventListener("click", () => refreshConfigStatus(c.id));
         card.querySelector(".config-delete-btn").addEventListener("click", () => deleteConfigAccount(c.id));
         
         container.appendChild(card);
     });
 }
 
-function verifyConfigAccount(id) {
-    const link = document.querySelector(`.config-verify-link[data-id="${id}"]`);
-    if (link) {
-        link.textContent = "Verifying...";
-        link.disabled = true;
+
+
+async function refreshConfigStatus(id) {
+    const badge = document.getElementById(`badge-${id}`);
+    if (badge) {
+        badge.className = "status-badge badge-warning";
+        badge.textContent = "Checking";
     }
     
-    fetch(`${API_BASE}/config/${id}/verify`, { method: "POST" })
-    .then(res => {
-        if (!res.ok) {
-            return res.json().then(err => { throw new Error(err.detail || "Verification failed") });
+    try {
+        const response = await fetch(`${API_BASE}/config/${id}/validate`, { method: "POST" });
+        if (!response.ok) {
+            const errData = await response.json();
+            throw new Error(errData.detail || "Validation failed");
         }
-        return res.json();
-    })
-    .then(data => {
-        showToast("Configuration verified successfully!", "success");
+        const data = await response.json();
+        showToast(`Configuration status: ${data.status}`, data.status === "Connected" ? "success" : "error");
         loadConfigs();
-    })
-    .catch(err => {
+    } catch (err) {
         showToast(err.message, "error");
         loadConfigs();
-    });
+    }
 }
 
 function deleteConfigAccount(id) {
@@ -1469,8 +1565,8 @@ function deleteConfigAccount(id) {
     .then(res => res.json())
     .then(data => {
         showToast("Configuration deleted successfully.", "success");
-        if (activeConfigId === id) {
-            activeConfigId = null;
+        if (activeAccountId === id) {
+            activeAccountId = null;
         }
         loadConfigs();
     })

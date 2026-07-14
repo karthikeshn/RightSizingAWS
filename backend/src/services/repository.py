@@ -1,7 +1,7 @@
 import datetime
 from src.db import get_db_connection
 
-def save_code_version(config_id, service_name, component_type, code_content, status, generated_by, reviewed_by=None, reviewed_at=None):
+def save_code_version(account_id, service_name, component_type, code_content, status, generated_by, reviewed_by=None, reviewed_at=None):
     """
     Saves a new code version. Auto-increments the version number for that component.
     """
@@ -20,11 +20,11 @@ def save_code_version(config_id, service_name, component_type, code_content, sta
     
     cursor.execute("""
         INSERT INTO code_repository (
-            config_id, service_name, component_type, version, code_content, 
+            account_id, service_name, component_type, version, code_content, 
             status, generated_by, reviewed_by, reviewed_at, created_at
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, (
-        None, service_name, component_type, next_ver, code_content, 
+        account_id, service_name, component_type, next_ver, code_content, 
         status, generated_by, reviewed_by, reviewed_at, now_str
     ))
     
@@ -33,7 +33,7 @@ def save_code_version(config_id, service_name, component_type, code_content, sta
     conn.close()
     return next_ver, new_id
 
-def get_latest_component_version(config_id, service_name, component_type):
+def get_latest_component_version(account_id, service_name, component_type):
     """
     Returns the latest version entry (regardless of approval status).
     """
@@ -48,7 +48,7 @@ def get_latest_component_version(config_id, service_name, component_type):
     conn.close()
     return dict(row) if row else None
 
-def get_latest_approved_component(config_id, service_name, component_type):
+def get_latest_approved_component(account_id, service_name, component_type):
     """
     Returns the latest approved version of a component.
     """
@@ -88,7 +88,7 @@ def update_review_status(code_id, status, reviewer_id=None, override_code=None):
         # or pending_review depending on the flow. In FR-6.2: "Approve as-is, Edit then approve".
         # If "Edit then approve", status is 'approved', but it creates a new version.
         new_ver, new_id = save_code_version(
-            config_id=entry['config_id'],
+            account_id=entry['account_id'],
             service_name=entry['service_name'],
             component_type=entry['component_type'],
             code_content=override_code,
@@ -109,7 +109,7 @@ def update_review_status(code_id, status, reviewer_id=None, override_code=None):
         conn.close()
         return code_id, entry['version']
 
-def get_component_history(config_id, service_name, component_type):
+def get_component_history(account_id, service_name, component_type):
     """
     Get full history of a service component (FR-5.4).
     """
@@ -124,7 +124,7 @@ def get_component_history(config_id, service_name, component_type):
     conn.close()
     return [dict(row) for row in rows]
 
-def get_all_services_code_status(config_id):
+def get_all_services_code_status(account_id):
     """
     Returns an overview of the code generation and review status for each service.
     """
@@ -143,7 +143,7 @@ def get_all_services_code_status(config_id):
         # Get status of discovery, metric_identification, and metric_fetching
         statuses = {}
         for ctype in ['discovery', 'metric_identification', 'metric_fetching']:
-            latest = get_latest_component_version(config_id, name, ctype)
+            latest = get_latest_component_version(account_id, name, ctype)
             statuses[ctype] = {
                 "version": latest['version'] if latest else None,
                 "status": latest['status'] if latest else 'missing',
