@@ -85,17 +85,25 @@ def summarize_resource_metrics(account_id, resource_id, service_type, region, lo
         else:
             trend = "Stable"
             
-        # Threshold checks (FR-9.1)
-        # e.g., CPU Above 70%, CPU Below 20%
+        # Threshold checks (FR-9.1) Grouped by day
+        daily_values = {}
+        for p in points:
+            day_str = p['timestamp'][:10]
+            if day_str not in daily_values:
+                daily_values[day_str] = []
+            daily_values[day_str].append(p['value'])
+            
         days_above = 0
         days_below = 0
         
-        if "cpu" in metric_name.lower():
-            days_above = sum(1 for v in values if v > 70.0)
-            days_below = sum(1 for v in values if v < 20.0)
-        elif "connection" in metric_name.lower():
-            days_above = sum(1 for v in values if v > 100.0)
-            days_below = sum(1 for v in values if v < 5.0)
+        for day_vals in daily_values.values():
+            day_avg = sum(day_vals) / len(day_vals)
+            if "cpu" in metric_name.lower():
+                if day_avg > 70.0: days_above += 1
+                if day_avg < 20.0: days_below += 1
+            elif "connection" in metric_name.lower():
+                if day_avg > 100.0: days_above += 1
+                if day_avg < 5.0: days_below += 1
             
         summary["metrics"][metric_name] = {
             "average": round(avg_val, 2),

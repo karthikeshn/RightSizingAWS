@@ -109,12 +109,32 @@ def run_pipeline_for_service(account_id, service_name, region, lookback_days=30)
     Orchestrate Module 7: Run resource discovery, then metric fetching for discovered resources,
     and persist results.
     """
+    import time
+    import logging
+    
+    discovery_duration = 0.0
+    metrics_duration = 0.0
+    
+    logger = logging.getLogger("pipeline")
+    if not logger.handlers:
+        fh = logging.FileHandler('pipeline.log')
+        fh.setLevel(logging.DEBUG)
+        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        fh.setFormatter(formatter)
+        logger.addHandler(fh)
+
     # 1. Discover resources
     try:
+        t0 = time.time()
         raw_resources = execute_discovery(account_id, service_name, region)
+        t1 = time.time()
+        discovery_duration = t1 - t0
+        logger.debug(f"[{region}] execute_discovery took {discovery_duration:.2f}s")
+        
         resources = filter_primary_resources(service_name, raw_resources)
         
         # Persist discovered resources
+        t2 = time.time()
         now_str = datetime.datetime.utcnow().isoformat()
         from src.db import get_db_connection
         conn = get_db_connection()
@@ -135,6 +155,8 @@ def run_pipeline_for_service(account_id, service_name, region, lookback_days=30)
             ))
         conn.commit()
         conn.close()
+        t3 = time.time()
+        logger.debug(f"[{region}] DB insert discovered resources took {t3 - t2:.2f}s")
 
     except Exception as e:
         # If discovery fails completely for a service, log it but let others run (FR-7.4)
@@ -153,6 +175,8 @@ def run_pipeline_for_service(account_id, service_name, region, lookback_days=30)
     processed_resources = []
     
     # 3. For each resource, fetch metrics
+    logger.info(f"[{region}] Starting metric fetching for {len(resources)} resources...")
+    t_metrics_start = time.time()
     for res in resources:
         res_id = res['id']
         res_type = res['type']
@@ -163,6 +187,7 @@ def run_pipeline_for_service(account_id, service_name, region, lookback_days=30)
             
         try:
             # Execute metric fetch (gracefully handles errors inside)
+            t_fetch_start = time.time()
             datapoints = execute_metric_fetching(
                 account_id=account_id,
                 service_name=service_name,
@@ -171,10 +196,15 @@ def run_pipeline_for_service(account_id, service_name, region, lookback_days=30)
                 metrics=metrics,
                 lookback_days=lookback_days
             )
+            t_fetch_end = time.time()
+            logger.debug(f"[{region}] execute_metric_fetching for {res_id} took {t_fetch_end - t_fetch_start:.2f}s")
             
             # Save metrics to store (Module 8)
             if datapoints:
+                t_save_start = time.time()
                 save_metric_points(account_id, res_id, service_name, region, datapoints)
+                t_save_end = time.time()
+                logger.debug(f"[{region}] save_metric_points for {res_id} took {t_save_end - t_save_start:.2f}s")
                 
             processed_resources.append({
                 "id": res_id,
@@ -187,8 +217,13 @@ def run_pipeline_for_service(account_id, service_name, region, lookback_days=30)
             # Catch-all to make sure next resource is processed
             print(f"Error in pipeline execution for resource {res_id}: {e}")
             
+    t_metrics_end = time.time()
+    metrics_duration = t_metrics_end - t_metrics_start
+            
     return {
         "status": "success",
-        "resources": processed_resources
+        "resources": processed_resources,
+        "discovery_duration": discovery_duration,
+        "metrics_duration": metrics_duration
     }
 

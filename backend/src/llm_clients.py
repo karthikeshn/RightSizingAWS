@@ -11,6 +11,39 @@ load_dotenv()
 gemini_key = os.getenv("GEMINI_API_KEY")
 openai_key = os.getenv("OPENAI_API_KEY")
 
+import threading
+
+class RateLimiter:
+    def __init__(self, max_calls, period):
+        self.max_calls = max_calls
+        self.period = period
+        self.calls = []
+        self.lock = threading.Lock()
+
+    def wait(self):
+        sleep_time = 0
+        with self.lock:
+            now = time.time()
+            # Remove calls older than the period
+            self.calls = [t for t in self.calls if now - t < self.period]
+            
+            if len(self.calls) >= self.max_calls:
+                # Calculate how long this thread needs to sleep
+                sleep_time = self.period - (now - self.calls[0])
+                if sleep_time > 0:
+                    self.calls.append(now + sleep_time)
+                else:
+                    self.calls.append(now)
+            else:
+                self.calls.append(now)
+                
+        # Sleep outside the lock so other threads can calculate their sleep times concurrently!
+        if sleep_time > 0:
+            time.sleep(sleep_time)
+
+# Gemini Free Tier limit: 15 requests per minute
+gemini_rate_limiter = RateLimiter(max_calls=15, period=60)
+
 
 def generate_text(prompt, system_instruction="", provider=None):
     """
@@ -31,7 +64,7 @@ def generate_text(prompt, system_instruction="", provider=None):
             )
 
     if selected_provider == "gemini":
-        model_name = os.getenv("GEMINI_MODEL", "models/gemini-2.5-flash-lite")
+        model_name = os.getenv("GEMINI_MODEL", "models/gemini-1.5-flash")
         client_gemini = genai.Client(api_key=gemini_key)
         full_prompt = f"{system_instruction}\n\n{prompt}" if system_instruction else prompt
 
@@ -42,7 +75,7 @@ def generate_text(prompt, system_instruction="", provider=None):
         else:
             models_to_try.append(f"models/{model_name}")
 
-        fallbacks = ["gemini-2.5-flash-lite", "gemini-2.5-flash", "gemini-2.0-flash"]
+        fallbacks = ["gemini-1.5-flash", "gemini-1.5-pro"]
         for fb in fallbacks:
             if fb not in models_to_try:
                 models_to_try.append(fb)
@@ -51,6 +84,9 @@ def generate_text(prompt, system_instruction="", provider=None):
         for current_model in models_to_try:
             for attempt in range(3):
                 try:
+                    # Enforce rate limit (max 15 requests per minute)
+                    gemini_rate_limiter.wait()
+                    
                     response = client_gemini.models.generate_content(
                         model=current_model,
                         contents=full_prompt

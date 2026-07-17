@@ -5,7 +5,7 @@ import json
 DB_FILE = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "db.sqlite")
 
 def get_db_connection():
-    conn = sqlite3.connect(DB_FILE)
+    conn = sqlite3.connect(DB_FILE, timeout=15.0)
     conn.row_factory = sqlite3.Row
     return conn
 
@@ -86,6 +86,14 @@ def init_db():
     """)
     
     # 5. Resource Summaries & Recommendations (Module 9 / 10)
+    cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='resource_summaries'")
+    if cursor.fetchone():
+        cursor.execute("PRAGMA table_info(resource_summaries)")
+        columns = [row['name'] for row in cursor.fetchall()]
+        if 'raw_llm_response' not in columns:
+            cursor.execute("ALTER TABLE resource_summaries ADD COLUMN raw_llm_response TEXT DEFAULT ''")
+        conn.commit()
+
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS resource_summaries (
             resource_id TEXT NOT NULL,
@@ -94,10 +102,12 @@ def init_db():
             region TEXT NOT NULL,
             analysis_date TEXT NOT NULL,
             summary_json TEXT NOT NULL,
-            recommendation TEXT NOT NULL, -- 'Upsize', 'Downsize', 'Keep Current', 'Specific Instance'
+            recommendation TEXT NOT NULL, -- 'Upsize', 'Downsize', 'Keep Current', 'Specific Instance', 'Analysis Failed'
             explanation TEXT NOT NULL,
+            raw_llm_response TEXT DEFAULT '',
             PRIMARY KEY (resource_id, account_id)
         )
+
     """)
     
     # 6. Discovered Resources
@@ -127,6 +137,38 @@ def init_db():
         ]
         cursor.executemany("INSERT INTO services_registry (service_name, supports_right_sizing) VALUES (?, ?)", defaults)
         
+    # 6. Billing Service Cache (Module 1/2)
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS billing_service_cache (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            account_id TEXT NOT NULL,
+            service_name TEXT NOT NULL,
+            original_name TEXT NOT NULL,
+            region TEXT NOT NULL,
+            status TEXT NOT NULL,
+            last_scanned TEXT NOT NULL
+        )
+    """)
+    
+    # 7. Pipeline Executions (History)
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS pipeline_executions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            account_id TEXT NOT NULL,
+            service_name TEXT NOT NULL,
+            start_time TEXT NOT NULL,
+            end_time TEXT,
+            duration_seconds REAL,
+            status TEXT NOT NULL,
+            total_regions INTEGER,
+            successful_regions INTEGER,
+            failed_regions INTEGER,
+            discovery_time_sec REAL,
+            metrics_time_sec REAL,
+            llm_time_sec REAL
+        )
+    """)
+    
     conn.commit()
     conn.close()
 

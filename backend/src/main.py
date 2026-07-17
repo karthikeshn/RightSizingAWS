@@ -19,11 +19,12 @@ from src.services.filtration import process_active_services, get_registry, updat
 from src.services.known_check import determine_service_status
 from src.services.repository import (
     get_all_services_code_status, save_code_version, 
-    get_latest_component_version, update_review_status, get_component_history
+    get_latest_component_version, update_review_status, get_component_history,
+    get_latest_code_for_service
 )
 from src.services.code_gen import generate_component_a, generate_component_b, generate_component_c
 from src.services.execution import run_pipeline_for_service
-from src.services.recommendation import get_saved_recommendations, generate_recommendation_for_resource
+from src.services.recommendation import get_saved_recommendations, generate_recommendation_for_resource, generate_recommendations_batch
 
 # Initialize database
 init_db()
@@ -76,64 +77,126 @@ class RunPipelineRequestSchema(BaseModel):
 
 def validate_aws_credentials(account_id: str) -> dict:
     from src.db import get_db_connection
-    import botocore
+    import botocore.exceptions
     
     conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT access_key, secret_key FROM cloud_configs WHERE account_id = ?", (account_id,))
-    row = cursor.fetchone()
-    
-    if not row:
-        conn.close()
-        raise HTTPException(status_code=404, detail="Cloud config not found")
+    try:
+        cursor = conn.cursor()
+        cursor.execute("SELECT access_key, secret_key FROM cloud_configs WHERE account_id = ?", (account_id,))
+        row = cursor.fetchone()
         
-    if row['access_key'] == 'mock' or row['secret_key'] == 'mock':
-        status = "Connected"
-    else:
-        try:
-            session = get_boto3_session(account_id)
-            sts = session.client('sts')
-            sts.get_caller_identity()
-            status = "Connected"
-        except botocore.exceptions.ClientError as e:
-            error_code = e.response.get('Error', {}).get('Code', 'Unknown')
-            if error_code in ['ExpiredToken', 'ExpiredTokenException']:
-                status = "Credentials Expired"
-            elif error_code in ['AuthFailure', 'InvalidClientTokenId', 'AccessDenied']:
-                status = "Invalid Credentials"
-            else:
-                status = "Connection Failed"
-        except Exception as e:
-            status = "Connection Failed"
+        if not row:
+            raise HTTPException(status_code=404, detail="Cloud config not found")
             
-    now = datetime.datetime.now(datetime.timezone.utc).isoformat()
-    cursor.execute("UPDATE cloud_configs SET status = ?, last_verified_at = ? WHERE account_id = ?", (status, now, account_id))
-    conn.commit()
-    conn.close()
+        if row['access_key'] == 'mock' or row['secret_key'] == 'mock':
+            status = "Connected"
+        else:
+            try:
+                session = get_boto3_session(account_id)
+                sts = session.client('sts')
+                sts.get_caller_identity()
+                status = "Connected"
+            except botocore.exceptions.ClientError as e:
+                error_code = e.response.get('Error', {}).get('Code', 'Unknown')
+                if error_code in ['ExpiredToken', 'ExpiredTokenException']:
+                    status = "Token Expired"
+                elif error_code in ['AuthFailure', 'InvalidClientTokenId', 'AccessDenied', 'UnrecognizedClientException']:
+                    status = "Incorrect Credentials"
+                else:
+                    status = f"Connection Failed: {error_code}"
+            except Exception as e:
+                status = f"Connection Failed: {str(e)}"
+                
+        now = datetime.datetime.now(datetime.timezone.utc).isoformat()
+        cursor.execute("UPDATE cloud_configs SET status = ?, last_verified_at = ? WHERE account_id = ?", (status, now, account_id))
+        conn.commit()
+    finally:
+        conn.close()
     
     return {"status": status, "last_verified_at": now}
 
 @app.get("/api/discovery/active-services")
 def get_active_services(account_id: Optional[str] = Query(None), lookback_days: int = 30):
     """
-    Module 1 & 2: Cost Explorer discovery filtered against the registry.
+    Module 1 & 2: Cost Explorer discovery - Fetched from cache.
     """
-    if account_id:
-        val_result = validate_aws_credentials(account_id)
-        if val_result["status"] != "Connected":
-            raise HTTPException(status_code=403, detail=f"Credential validation failed: {val_result['status']}")
+    if not account_id:
+        return {"active_services": [], "unclassified_services": [], "last_scanned": None}
 
-    raw_ce_results = query_cost_explorer_services(lookback_days, account_id)
+    from src.db import get_db_connection
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM billing_service_cache WHERE account_id = ?", (account_id,))
+    rows = cursor.fetchall()
+    conn.close()
+
+    all_services = []
+    last_scanned = None
+    for row in rows:
+        all_services.append({
+            "service_name": row["service_name"],
+            "original_name": row["original_name"],
+            "region": row["region"],
+            "status": row["status"]
+        })
+        if not last_scanned:
+            last_scanned = row["last_scanned"]
+            
+    return {
+        "active_services": all_services,
+        "unclassified_services": [],
+        "last_scanned": last_scanned
+    }
+
+class ScanRequest(BaseModel):
+    account_id: str
+    lookback_days: Optional[int] = 30
+
+@app.post("/api/discovery/scan")
+def scan_active_services(data: ScanRequest):
+    """
+    Perform a live Cost Explorer query and update the cache.
+    """
+    val_result = validate_aws_credentials(data.account_id)
+    if val_result["status"] != "Connected":
+        raise HTTPException(status_code=403, detail=f"Credential validation failed: {val_result['status']}")
+
+    raw_ce_results = query_cost_explorer_services(data.lookback_days, data.account_id)
     all_services = process_active_services(raw_ce_results)
     
     # Enrich with Known/New status based on mapping
     for item in all_services:
         item['status'] = "Known Service" if item['is_known'] else "New Service"
         
-    return {
-        "active_services": all_services,
-        "unclassified_services": []
-    }
+    now = datetime.datetime.now(datetime.timezone.utc).isoformat()
+
+    from src.db import get_db_connection
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor()
+        
+        # Clear old cache
+        cursor.execute("DELETE FROM billing_service_cache WHERE account_id = ?", (data.account_id,))
+        
+        # Insert new cache
+        for item in all_services:
+            cursor.execute("""
+                INSERT INTO billing_service_cache (account_id, service_name, original_name, region, status, last_scanned)
+                VALUES (?, ?, ?, ?, ?, ?)
+            """, (
+                data.account_id,
+                item["service_name"],
+                item.get("original_name", item["service_name"]),
+                item["region"],
+                item["status"],
+                now
+            ))
+            
+        conn.commit()
+    finally:
+        conn.close()
+
+    return {"message": "Scan completed successfully", "services_count": len(all_services), "last_scanned": now}
 
 @app.get("/api/services/summary")
 def get_services_summary(account_id: Optional[str] = Query(None), lookback_days: int = 30):
@@ -390,6 +453,13 @@ def delete_config(account_id: str):
 
 
 
+@app.get("/api/code/latest/{service_name}")
+def get_latest_service_code(service_name: str, account_id: str = Query(...)):
+    """
+    Returns the latest code for all components of a service.
+    """
+    res = get_latest_code_for_service(account_id, service_name)
+    return {"components": res}
 
 @app.get("/api/code/status")
 def get_code_status_summary(account_id: Optional[str] = Query(None)):
@@ -486,7 +556,22 @@ def run_service_execution(data: RunPipelineRequestSchema):
             detail=f"Service {data.service_name} has unapproved components. Approve code before running execution."
         )
 
+    import time
+    import logging
+    logger = logging.getLogger("pipeline")
+    logger.setLevel(logging.DEBUG)
+    # Add file handler to capture logs
+    if not logger.handlers:
+        fh = logging.FileHandler('pipeline.log')
+        fh.setLevel(logging.DEBUG)
+        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        fh.setFormatter(formatter)
+        logger.addHandler(fh)
+
     def process_region(region):
+        start_time = time.time()
+        run_start_date_str = datetime.datetime.utcnow().isoformat()
+        logger.info(f"[{region}] Started process_region")
         region_recommendations = []
         # Run execution pipeline (discovers resources, fetches metrics, saves to store)
         result = run_pipeline_for_service(
@@ -500,53 +585,164 @@ def run_service_execution(data: RunPipelineRequestSchema):
             raise Exception(result.get('error', 'Unknown error'))
             
         resources_analyzed = len(result["resources"])
+        logger.info(f"[{region}] Discovered {resources_analyzed} resources. Starting LLM generation...")
         
-        # Run recommendations for each successfully processed resource
-        for res in result["resources"]:
-            # Generate recommendations
-            rec_result = generate_recommendation_for_resource(
-                account_id=data.account_id,
-                resource_id=res["id"],
-                service_type=data.service_name,
-                region=region,
-                resource_capacity_type=res["type"],
-                lookback_days=data.lookback_days,
-                metadata=res.get("metadata", {})
-            )
-            region_recommendations.append(rec_result)
-            
-        return region, resources_analyzed, region_recommendations
+        def process_batch(batch):
+            batch_start = time.time()
+            try:
+                results = generate_recommendations_batch(
+                    account_id=data.account_id,
+                    resources_batch=batch,
+                    service_type=data.service_name,
+                    region=region,
+                    lookback_days=data.lookback_days
+                )
+                logger.info(f"[{region}] Batch of {len(batch)} finished in {time.time() - batch_start:.2f}s")
+                return results
+            except Exception as e:
+                logger.error(f"[{region}] Error processing batch: {e}")
+                return []
 
-    def execution_generator():
-        yield json.dumps({"type": "start", "regions": data.regions}) + "\n"
+        # Chunk into batches of 5
+        batch_size = 5
+        resource_batches = [result["resources"][i:i + batch_size] for i in range(0, len(result["resources"]), batch_size)]
+        
+        t_llm_start = time.time()
+        with ThreadPoolExecutor(max_workers=min(10, max(1, len(resource_batches)))) as executor:
+            future_to_batch = {executor.submit(process_batch, batch): batch for batch in resource_batches}
+            for future in as_completed(future_to_batch):
+                recs = future.result()
+                if recs:
+                    region_recommendations.extend(recs)
+        llm_duration = time.time() - t_llm_start
+            
+        # Garbage Collection: Delete ghost records not updated during this run
+        from src.db import get_db_connection
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute('''
+                DELETE FROM resource_summaries 
+                WHERE account_id = ? AND service_type = ? AND region = ? AND analysis_date < ?
+            ''', (data.account_id, data.service_name, region, run_start_date_str))
+            deleted_count = cursor.rowcount
+            conn.commit()
+            conn.close()
+            logger.info(f"[{region}] Garbage collection removed {deleted_count} stale/ghost records.")
+        except Exception as e:
+            logger.error(f"[{region}] Error during garbage collection: {e}")
+            
+        logger.info(f"[{region}] Finished process_region in {time.time() - start_time:.2f}s")
+        return region, resources_analyzed, region_recommendations, result.get("discovery_duration", 0), result.get("metrics_duration", 0), llm_duration
+
+    import asyncio
+    async def execution_generator():
+        gen_start = time.time()
+        start_time_iso = datetime.datetime.utcnow().isoformat() + "Z"
+        
+        # Initialize execution in DB
+        from src.db import get_db_connection
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute('''
+            INSERT INTO pipeline_executions (account_id, service_name, start_time, status, total_regions, successful_regions, failed_regions, discovery_time_sec, metrics_time_sec, llm_time_sec)
+            VALUES (?, ?, ?, 'Running', ?, 0, 0, 0.0, 0.0, 0.0)
+        ''', (data.account_id, data.service_name, start_time_iso, len(data.regions)))
+        execution_id = cursor.lastrowid
+        conn.commit()
+        conn.close()
+        
+        logger.info(f"Started execution_generator (execution_id={execution_id})")
+        yield json.dumps({"type": "start", "regions": data.regions, "execution_id": execution_id}) + "\n"
         
         total_resources_analyzed = 0
+        successful_regions = 0
+        failed_regions = 0
+        max_discovery = 0.0
+        max_metrics = 0.0
+        max_llm = 0.0
+        
         max_workers = int(os.environ.get("MAX_WORKERS", 5))
         
-        with ThreadPoolExecutor(max_workers=max_workers) as executor:
-            future_to_region = {executor.submit(process_region, region): region for region in data.regions}
+        # We use asyncio.gather to run all regions concurrently without blocking the async generator loop
+        submit_times = {}
+        for region in data.regions:
+            submit_times[region] = time.time()
             
-            for future in as_completed(future_to_region):
-                region = future_to_region[future]
-                try:
-                    _, resources_analyzed, _ = future.result()
-                    total_resources_analyzed += resources_analyzed
-                    yield json.dumps({
-                        "type": "region_success", 
-                        "region": region, 
-                        "resources_analyzed": resources_analyzed
-                    }) + "\n"
-                except Exception as exc:
-                    print(f"Region {region} generated an exception: {exc}")
-                    yield json.dumps({
-                        "type": "region_error", 
-                        "region": region, 
-                        "error": str(exc)
-                    }) + "\n"
+        async def run_region_async(region):
+            loop = asyncio.get_running_loop()
+            return await loop.run_in_executor(None, process_region, region)
 
-        yield json.dumps({"type": "complete", "total_resources": total_resources_analyzed}) + "\n"
+        tasks = [asyncio.create_task(run_region_async(region)) for region in data.regions]
+        
+        for task in asyncio.as_completed(tasks):
+            try:
+                region, resources_analyzed, _, d_dur, m_dur, l_dur = await task
+                wait_time = time.time() - submit_times[region]
+                logger.info(f"[{region}] Thread finished. Total time since submit: {wait_time:.2f}s")
+                total_resources_analyzed += resources_analyzed
+                successful_regions += 1
+                max_discovery = max(max_discovery, d_dur)
+                max_metrics = max(max_metrics, m_dur)
+                max_llm = max(max_llm, l_dur)
+                
+                # We use the max duration across all concurrent regions to represent 
+                # the wall-clock bottleneck for each pipeline phase.
+                
+                yield json.dumps({
+                    "type": "region_complete", 
+                    "region": region,
+                    "status": "success",
+                    "resources_analyzed": resources_analyzed
+                }) + "\n"
+            except Exception as exc:
+                failed_regions += 1
+                # Find which region failed if possible, but tasks lose context, so we might need a wrapper
+                logger.error(f"Region generated an exception: {exc}")
+                yield json.dumps({
+                    "type": "region_complete",
+                    "region": "unknown", # Hard to map without wrapper
+                    "status": "error",
+                    "error": str(exc)
+                }) + "\n"
+                
+        duration_seconds = time.time() - gen_start
+        status = "Completed" if failed_regions == 0 else ("Failed" if successful_regions == 0 else "Partial Success")
+        end_time_iso = datetime.datetime.utcnow().isoformat() + "Z"
+        
+        # Update DB record with completion data
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute('''
+            UPDATE pipeline_executions
+            SET end_time = ?, duration_seconds = ?, status = ?, successful_regions = ?, failed_regions = ?, discovery_time_sec = ?, metrics_time_sec = ?, llm_time_sec = ?
+            WHERE id = ?
+        ''', (end_time_iso, duration_seconds, status, successful_regions, failed_regions, max_discovery, max_metrics, max_llm, execution_id))
+        conn.commit()
+        conn.close()
+        
+        logger.info(f"Finished execution_generator in {duration_seconds:.2f}s")
+        yield json.dumps({"type": "finish", "total_resources": total_resources_analyzed, "execution_id": execution_id}) + "\n"
 
     return StreamingResponse(execution_generator(), media_type="application/x-ndjson")
+
+@app.get("/api/executions/{account_id}/{service_name}")
+def get_execution_history(account_id: str, service_name: str):
+    """
+    Fetch pipeline execution history for a service.
+    """
+    from src.db import get_db_connection
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('''
+        SELECT id, start_time, end_time, duration_seconds, status, total_regions, successful_regions, failed_regions, discovery_time_sec, metrics_time_sec, llm_time_sec
+        FROM pipeline_executions
+        WHERE account_id = ? AND service_name = ?
+        ORDER BY start_time DESC
+    ''', (account_id, service_name))
+    rows = cursor.fetchall()
+    conn.close()
+    return [dict(row) for row in rows]
 
 @app.get("/api/recommendations")
 def get_recommendations(account_id: Optional[str] = Query(None), service_name: Optional[str] = None, region: Optional[str] = None):
@@ -554,6 +750,32 @@ def get_recommendations(account_id: Optional[str] = Query(None), service_name: O
     Module 10: Fetch list of recommendations, optionally filtered.
     """
     return get_saved_recommendations(account_id, service_name, region)
+
+@app.get("/api/metrics/{account_id}/{resource_id}")
+def get_resource_metrics(account_id: str, resource_id: str, start_time: Optional[str] = None, end_time: Optional[str] = None):
+    """
+    Fetch raw metrics points for a resource.
+    """
+    from src.db import get_db_connection
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    query = "SELECT metric_name, timestamp, value, unit FROM metric_store WHERE account_id = ? AND resource_id = ?"
+    params = [account_id, resource_id]
+    
+    if start_time:
+        query += " AND timestamp >= ?"
+        params.append(start_time)
+    if end_time:
+        query += " AND timestamp <= ?"
+        params.append(end_time)
+        
+    query += " ORDER BY timestamp ASC"
+    cursor.execute(query, params)
+    rows = cursor.fetchall()
+    conn.close()
+    
+    return [dict(row) for row in rows]
 
 # --- Static Front-End Server ---
 

@@ -41,9 +41,9 @@ def get_latest_component_version(account_id, service_name, component_type):
     cursor = conn.cursor()
     cursor.execute("""
         SELECT * FROM code_repository
-        WHERE service_name = ? AND component_type = ?
+        WHERE account_id = ? AND service_name = ? AND component_type = ?
         ORDER BY version DESC LIMIT 1
-    """, (service_name, component_type))
+    """, (account_id, service_name, component_type))
     row = cursor.fetchone()
     conn.close()
     return dict(row) if row else None
@@ -56,9 +56,9 @@ def get_latest_approved_component(account_id, service_name, component_type):
     cursor = conn.cursor()
     cursor.execute("""
         SELECT * FROM code_repository
-        WHERE service_name = ? AND component_type = ? AND status = 'approved'
+        WHERE account_id = ? AND service_name = ? AND component_type = ? AND status = 'approved'
         ORDER BY version DESC LIMIT 1
-    """, (service_name, component_type))
+    """, (account_id, service_name, component_type))
     row = cursor.fetchone()
     conn.close()
     return dict(row) if row else None
@@ -108,6 +108,30 @@ def update_review_status(code_id, status, reviewer_id=None, override_code=None):
         conn.commit()
         conn.close()
         return code_id, entry['version']
+
+def get_latest_code_for_service(account_id, service_name):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    components = ['discovery', 'metric_identification', 'metric_fetching']
+    res = {}
+    for comp in components:
+        cursor.execute("""
+            SELECT id, code_content, status
+            FROM code_repository
+            WHERE account_id = ? AND service_name = ? AND component_type = ?
+            ORDER BY version DESC LIMIT 1
+        """, (account_id, service_name, comp))
+        row = cursor.fetchone()
+        if row:
+            res[comp] = {
+                "id": row["id"],
+                "code": row["code_content"],
+                "status": row["status"]
+            }
+        else:
+            res[comp] = None
+    conn.close()
+    return res
 
 def get_component_history(account_id, service_name, component_type):
     """
