@@ -109,6 +109,12 @@ export const fetchRecommendations = async (accountId) => {
     return res.json();
 };
 
+export const fetchAnalyzedServices = async (accountId) => {
+    const res = await fetch(`${API_BASE_URL}/analyzed-services?account_id=${accountId}`);
+    if (!res.ok) throw new Error('Failed to fetch analyzed services');
+    return res.json();
+};
+
 export const fetchResourceMetrics = async (accountId, resourceId) => {
     const res = await fetch(`${API_BASE_URL}/metrics/${accountId}/${resourceId}`);
     if (!res.ok) throw new Error('Failed to fetch resource metrics');

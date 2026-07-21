@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { fetchRecommendations, fetchResourceMetrics } from '../services/api';
+import { fetchRecommendations, fetchAnalyzedServices, fetchBillingServices, fetchResourceMetrics } from '../services/api';
 import { Search, ChevronDown, ChevronUp, Code, X } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 const AnalysisResults = ({ activeConfigId }) => {
     const [loading, setLoading] = useState(false);
     const [recommendations, setRecommendations] = useState([]);
+    const [analyzedServices, setAnalyzedServices] = useState([]);
+    const [billingServices, setBillingServices] = useState([]);
     const [error, setError] = useState(null);
 
     // Filters
@@ -37,6 +39,16 @@ const AnalysisResults = ({ activeConfigId }) => {
         try {
             const data = await fetchRecommendations(activeConfigId);
             setRecommendations(data || []);
+            const servicesData = await fetchAnalyzedServices(activeConfigId);
+            setAnalyzedServices(servicesData || []);
+            
+            try {
+                const bData = await fetchBillingServices(activeConfigId);
+                setBillingServices(bData?.active_services || []);
+            } catch (err) {
+                console.warn('Could not fetch billing services', err);
+                setBillingServices([]);
+            }
         } catch (e) {
             setError(e.message);
         } finally {
@@ -99,14 +111,24 @@ const AnalysisResults = ({ activeConfigId }) => {
     }
 
     // Derived options for filters
-    const services = ['All Services', ...new Set(recommendations.map(r => r.service_type))];
+    const services = ['All Services', ...analyzedServices];
     
-    let availableRegions = ['All Regions'];
+    // Provide all active regions from recommendations + billed regions from billing cache
+    const activeRegions = new Set();
+    
     if (serviceFilter === 'All Services') {
-        availableRegions = ['All Regions', ...new Set(recommendations.map(r => r.region))];
+        recommendations.forEach(r => activeRegions.add(r.region));
+        billingServices.forEach(b => activeRegions.add(b.region));
     } else {
-        availableRegions = ['All Regions', ...new Set(recommendations.filter(r => r.service_type === serviceFilter).map(r => r.region))];
+        recommendations.filter(r => r.service_type === serviceFilter).forEach(r => activeRegions.add(r.region));
+        billingServices.filter(b => b.service_name === serviceFilter).forEach(b => activeRegions.add(b.region));
     }
+    
+    const availableRegions = ['All Regions', ...activeRegions].sort((a, b) => {
+        if (a === 'All Regions') return -1;
+        if (b === 'All Regions') return 1;
+        return a.localeCompare(b);
+    });
     
     // Automatically reset region if not available in selected service
     if (!availableRegions.includes(regionFilter)) {
@@ -289,6 +311,18 @@ const AnalysisResults = ({ activeConfigId }) => {
                                                         Current Type: <span className="font-bold text-white font-mono">{row.summary?.current_capacity || 'N/A'}</span>
                                                     </div>
                                                 </div>
+
+                                                {/* AI Explanation / Summary */}
+                                                {row.explanation && (
+                                                    <div className="px-6 pb-4">
+                                                        <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
+                                                            <h3 className="text-xs font-bold text-blue-400 mb-1 flex items-center gap-2 uppercase tracking-wider">
+                                                                AI Explanation
+                                                            </h3>
+                                                            <p className="text-sm text-zinc-300 leading-relaxed">{row.explanation}</p>
+                                                        </div>
+                                                    </div>
+                                                )}
 
                                                 <div className="grid grid-cols-12 gap-6 px-6 pb-6">
                                                     {/* Chart Area */}

@@ -13,7 +13,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 # Add the parent folder to path to resolve src imports properly
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from src.db import init_db
+from src.db import init_db, get_db_connection
 from src.aws_clients import query_cost_explorer_services, get_boto3_session
 from src.services.filtration import process_active_services, get_registry, update_registry_service
 from src.services.known_check import determine_service_status
@@ -776,6 +776,19 @@ def get_resource_metrics(account_id: str, resource_id: str, start_time: Optional
     conn.close()
     
     return [dict(row) for row in rows]
+
+@app.get("/api/analyzed-services")
+def get_analyzed_services(account_id: str):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT DISTINCT service_name FROM pipeline_executions WHERE account_id = ?
+        UNION
+        SELECT DISTINCT service_type as service_name FROM resource_summaries WHERE account_id = ?
+    """, (account_id, account_id))
+    rows = cursor.fetchall()
+    conn.close()
+    return [row['service_name'] for row in rows]
 
 # --- Static Front-End Server ---
 
