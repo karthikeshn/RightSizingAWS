@@ -3,13 +3,11 @@ import { Settings, Cloud, Activity, Code, Server, Map, BarChart2 } from 'lucide-
 
 const Sidebar = ({ activeTab, setActiveTab }) => {
     const navItems = [
-        { id: 'dashboard', label: 'Dashboard', icon: <Activity size={18} /> },
-        { id: 'analysis', label: 'Analysis Results', icon: <BarChart2 size={18} /> },
+        { id: 'dashboard', label: 'Platform Overview', icon: <Activity size={18} /> },
         { id: 'config', label: 'Cloud Configuration', icon: <Settings size={18} /> },
-        { id: 'services', label: 'Services Discovery', icon: <Map size={18} /> },
-        { id: 'code', label: 'Code Repository', icon: <Code size={18} /> },
-        { id: 'registry', label: 'Registry Admin', icon: <Server size={18} /> },
     ];
+
+    const isDashboardArea = ['dashboard', 'analysis', 'services', 'code', 'registry'].includes(activeTab);
 
     return (
         <div className="w-64 h-screen border-r border-zinc-800/50 bg-black flex flex-col shrink-0">
@@ -27,12 +25,12 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
                         key={item.id}
                         onClick={() => setActiveTab(item.id)}
                         className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors w-full text-left font-medium ${
-                            activeTab === item.id 
+                            (item.id === 'dashboard' && isDashboardArea) || activeTab === item.id 
                                 ? 'bg-zinc-800/80 text-white' 
                                 : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900/50'
                         }`}
                     >
-                        <span className={activeTab === item.id ? 'text-blue-400' : 'text-zinc-500'}>
+                        <span className={(item.id === 'dashboard' && isDashboardArea) || activeTab === item.id ? 'text-blue-400' : 'text-zinc-500'}>
                             {item.icon}
                         </span>
                         {item.label}

@@ -751,6 +751,26 @@ def get_recommendations(account_id: Optional[str] = Query(None), service_name: O
     """
     return get_saved_recommendations(account_id, service_name, region)
 
+@app.get("/api/export/report")
+def export_report(account_id: str, service_name: str, region: Optional[str] = None, rec_filter: Optional[str] = None):
+    """
+    Export Analysis Report as an Excel file.
+    """
+    from src.services.export_service import generate_export_workbook
+    from fastapi.responses import StreamingResponse
+    import datetime
+    
+    stream = generate_export_workbook(account_id, service_name, region, rec_filter)
+    
+    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f"RightSizing_Report_{service_name}_{account_id}_{timestamp}.xlsx"
+    
+    return StreamingResponse(
+        iter([stream.getvalue()]), 
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": f"attachment; filename={filename}"}
+    )
+
 @app.get("/api/metrics/{account_id}/{resource_id}")
 def get_resource_metrics(account_id: str, resource_id: str, start_time: Optional[str] = None, end_time: Optional[str] = None):
     """

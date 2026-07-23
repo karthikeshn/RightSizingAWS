@@ -189,3 +189,30 @@ export const fetchExecutionHistory = async (accountId, serviceName) => {
     }
     return res.json();
 };
+
+export const exportAnalysisReport = async (accountId, serviceName, region, recFilter) => {
+    let url = `${API_BASE_URL}/export/report?account_id=${accountId}&service_name=${serviceName}`;
+    if (region && region !== 'All Regions') url += `&region=${encodeURIComponent(region)}`;
+    if (recFilter && recFilter !== 'All Recommendations') url += `&rec_filter=${encodeURIComponent(recFilter)}`;
+
+    const res = await fetch(url);
+    if (!res.ok) {
+        throw new Error('Failed to export report');
+    }
+    
+    // We expect a blob (Excel file)
+    const blob = await res.blob();
+    
+    // Extract filename from Content-Disposition header if possible
+    let filename = `RightSizing_Report_${serviceName}_${accountId}.xlsx`;
+    const disposition = res.headers.get('content-disposition');
+    if (disposition && disposition.indexOf('filename=') !== -1) {
+        const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+        const matches = filenameRegex.exec(disposition);
+        if (matches != null && matches[1]) { 
+            filename = matches[1].replace(/['"]/g, '');
+        }
+    }
+    
+    return { blob, filename };
+};

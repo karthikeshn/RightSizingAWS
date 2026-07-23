@@ -55,13 +55,26 @@ def generate_text(prompt, system_instruction="", provider=None):
             "Set BEDROCK_AWS_ACCESS_KEY_ID and BEDROCK_AWS_SECRET_ACCESS_KEY in backend/.env"
         )
 
+    bedrock_session_token = os.getenv("BEDROCK_AWS_SESSION_TOKEN")
+
     # Initialize the Bedrock client using the dedicated account credentials
-    client = boto3.client(
-        service_name='bedrock-runtime',
-        region_name=bedrock_region,
-        aws_access_key_id=bedrock_access_key,
-        aws_secret_access_key=bedrock_secret_key
-    )
+    client_kwargs = {
+        'service_name': 'bedrock-runtime',
+        'region_name': bedrock_region,
+        'aws_access_key_id': bedrock_access_key,
+        'aws_secret_access_key': bedrock_secret_key
+    }
+    
+    # If a bedrock-specific session token is provided, use it.
+    # Otherwise, explicitly set it to None to prevent boto3 from accidentally 
+    # inheriting a temporary AWS_SESSION_TOKEN from the OS environment, which 
+    # would cause an UnrecognizedClientException when paired with the bedrock access key.
+    if bedrock_session_token:
+        client_kwargs['aws_session_token'] = bedrock_session_token
+    elif 'AWS_SESSION_TOKEN' in os.environ:
+        client_kwargs['aws_session_token'] = None
+
+    client = boto3.client(**client_kwargs)
 
     # Format the request using the modern Bedrock Converse API
     messages = [{"role": "user", "content": [{"text": prompt}]}]

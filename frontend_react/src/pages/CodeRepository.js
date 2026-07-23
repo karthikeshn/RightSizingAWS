@@ -183,7 +183,7 @@ const CodeRepository = ({ activeConfigId }) => {
     };
 
     return (
-        <div className="flex flex-col gap-5 h-[calc(100vh-120px)] max-w-6xl overflow-y-auto custom-scrollbar pr-2 pb-10">
+        <div className="flex flex-col gap-5 h-[calc(100vh-120px)] max-w-6xl overflow-y-auto scrollbar-thin pr-2 pb-10">
             <div className="flex gap-5 min-h-[500px] shrink-0">
                 {/* Left Panel */}
                 <div className="w-80 flex flex-col gap-4">
@@ -264,7 +264,7 @@ const CodeRepository = ({ activeConfigId }) => {
                     {executionStatus && (
                         <div className="mt-4 border-t border-zinc-800/80 pt-3">
                             <h5 className="text-[10px] uppercase text-zinc-500 font-semibold tracking-wider mb-2">Region Execution</h5>
-                            <div className="space-y-2 max-h-32 overflow-y-auto pr-1 custom-scrollbar">
+                            <div className="space-y-2 max-h-32 overflow-y-auto pr-1 scrollbar-thin">
                                 {Object.entries(executionStatus).map(([region, status]) => (
                                     <div key={region} className="flex items-center justify-between text-xs">
                                         <span className="text-zinc-300">{region}</span>
@@ -318,19 +318,24 @@ const CodeRepository = ({ activeConfigId }) => {
                                      activeComponent === 'metric_identification' ? 'Metrics Array' : 
                                      'fetch_metrics()'}
                                 </span>
-                                <span className={`text-[9px] px-1.5 py-0.5 rounded-full ${
-                                    codeState[activeComponent].status === 'Approved' ? 'bg-green-500/10 text-green-400' :
-                                    codeState[activeComponent].status === 'Rejected' ? 'bg-red-500/10 text-red-400' :
-                                    'bg-yellow-500/10 text-yellow-400'
+                                <span className={`text-[9px] px-1.5 py-0.5 rounded-full capitalize ${
+                                    (codeState[activeComponent].status || '').toLowerCase() === 'approved' ? 'bg-green-500/10 text-green-400 border border-green-500/20' :
+                                    (codeState[activeComponent].status || '').toLowerCase() === 'rejected' ? 'bg-red-500/10 text-red-400 border border-red-500/20' :
+                                    'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20'
                                 }`}>
                                     {codeState[activeComponent].status}
                                 </span>
                             </div>
                             
                             <textarea 
-                                className="flex-1 w-full bg-zinc-900 border border-zinc-800 rounded-lg p-4 font-mono text-xs text-zinc-300 outline-none focus:border-zinc-700 resize-none"
+                                className={`flex-1 w-full bg-zinc-900 border rounded-lg p-4 font-mono text-xs text-zinc-300 outline-none resize-none transition-colors scrollbar-thin ${
+                                    (codeState[activeComponent].status || '').toLowerCase() === 'approved' 
+                                        ? 'border-zinc-800/50 opacity-80 cursor-not-allowed' 
+                                        : 'border-zinc-800 focus:border-zinc-600'
+                                }`}
                                 value={codeState[activeComponent].code}
                                 onChange={(e) => setCodeState({...codeState, [activeComponent]: { ...codeState[activeComponent], code: e.target.value }})}
+                                readOnly={(codeState[activeComponent].status || '').toLowerCase() === 'approved'}
                                 spellCheck="false"
                                 placeholder="// Click 'Generate AI Code' to populate..."
                             />

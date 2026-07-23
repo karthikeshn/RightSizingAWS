@@ -73,11 +73,11 @@ def summarize_resource_metrics(account_id, resource_id, service_type, region, lo
         
         # Trend calculation based on slope threshold
         slope = calculate_slope(values)
-        # We classify trend as:
         # - 'Increasing' if slope is positive and relative change is meaningful (> 1% of average per day)
         # - 'Decreasing' if slope is negative and relative change is meaningful (< -1% of average per day)
         # - 'Stable' otherwise
-        slope_threshold = 0.01 * (avg_val if avg_val > 0 else 1.0)
+        points_per_day = max(1, N / lookback_days) if lookback_days > 0 else 1
+        slope_threshold = (0.01 * (avg_val if avg_val > 0 else 1.0)) / points_per_day
         if slope > slope_threshold:
             trend = "Increasing"
         elif slope < -slope_threshold:

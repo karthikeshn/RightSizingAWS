@@ -153,10 +153,33 @@ def run_pipeline_for_service(account_id, service_name, region, lookback_days=30)
                 json.dumps(r.get('metadata', {})),
                 now_str
             ))
+        
+        # Cleanup stale resources that no longer exist in AWS
+        current_resource_ids = [r.get('id', '') for r in resources]
+        if current_resource_ids:
+            placeholders = ', '.join(['?'] * len(current_resource_ids))
+            # Delete from discovered_resources
+            cursor.execute(f"""
+                DELETE FROM discovered_resources 
+                WHERE account_id = ? AND service_type = ? AND region = ? 
+                AND resource_id NOT IN ({placeholders})
+            """, [account_id, service_name, region] + current_resource_ids)
+            
+            # Delete from resource_summaries to remove ghost recommendations
+            cursor.execute(f"""
+                DELETE FROM resource_summaries 
+                WHERE account_id = ? AND service_type = ? AND region = ? 
+                AND resource_id NOT IN ({placeholders})
+            """, [account_id, service_name, region] + current_resource_ids)
+        else:
+            # If no resources found, delete all previously discovered for this region
+            cursor.execute("DELETE FROM discovered_resources WHERE account_id = ? AND service_type = ? AND region = ?", (account_id, service_name, region))
+            cursor.execute("DELETE FROM resource_summaries WHERE account_id = ? AND service_type = ? AND region = ?", (account_id, service_name, region))
+            
         conn.commit()
         conn.close()
         t3 = time.time()
-        logger.debug(f"[{region}] DB insert discovered resources took {t3 - t2:.2f}s")
+        logger.debug(f"[{region}] DB insert & cleanup discovered resources took {t3 - t2:.2f}s")
 
     except Exception as e:
         # If discovery fails completely for a service, log it but let others run (FR-7.4)
