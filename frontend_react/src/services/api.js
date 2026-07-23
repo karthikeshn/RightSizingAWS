@@ -1,4 +1,4 @@
-const API_BASE_URL = '/api';
+const API_BASE_URL = process.env.NODE_ENV === 'production' ? '/api' : 'http://127.0.0.1:8000/api';
 
 export const fetchCloudConfigs = async () => {
     const res = await fetch(`${API_BASE_URL}/config`);
@@ -127,13 +127,13 @@ export const fetchRegistry = async () => {
     return res.json();
 };
 
-export const addRegistryService = async (serviceName, description) => {
+export const updateRegistryService = async (serviceName, supportsRightSizing) => {
     const res = await fetch(`${API_BASE_URL}/registry`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ service_name: serviceName, description })
+        body: JSON.stringify({ service_name: serviceName, supports_right_sizing: supportsRightSizing })
     });
-    if (!res.ok) throw new Error('Failed to add registry service');
+    if (!res.ok) throw new Error('Failed to update registry service');
     return res.json();
 };
 

@@ -12100,3 +12100,711 @@
 2026-07-17 16:28:44,229 - pipeline - INFO - [us-west-2] Finished process_region in 6.45s
 2026-07-17 16:28:44,230 - pipeline - INFO - [us-west-2] Thread finished. Total time since submit: 6.45s
 2026-07-17 16:28:44,247 - pipeline - INFO - Finished execution_generator in 6.47s
+2026-07-22 12:34:19,472 - pipeline - INFO - Started execution_generator (execution_id=12)
+2026-07-22 12:34:19,474 - pipeline - INFO - [us-east-1] Started process_region
+2026-07-22 12:34:19,474 - pipeline - INFO - [us-east-2] Started process_region
+2026-07-22 12:34:19,475 - pipeline - INFO - [us-east-1] Started process_region
+2026-07-22 12:34:19,476 - pipeline - INFO - [us-east-2] Started process_region
+2026-07-22 12:34:24,601 - pipeline - DEBUG - [us-east-1] execute_discovery took 5.12s
+2026-07-22 12:34:24,605 - pipeline - DEBUG - [us-east-1] DB insert discovered resources took 0.00s
+2026-07-22 12:34:24,609 - pipeline - DEBUG - [us-east-1] execute_discovery took 5.13s
+2026-07-22 12:34:24,611 - pipeline - INFO - [us-east-1] Starting metric fetching for 0 resources...
+2026-07-22 12:34:24,611 - pipeline - INFO - [us-east-1] Discovered 0 resources. Starting LLM generation...
+2026-07-22 12:34:24,615 - pipeline - DEBUG - [us-east-1] DB insert discovered resources took 0.01s
+2026-07-22 12:34:24,619 - pipeline - INFO - [us-east-1] Garbage collection removed 0 stale/ghost records.
+2026-07-22 12:34:24,619 - pipeline - INFO - [us-east-1] Finished process_region in 5.14s
+2026-07-22 12:34:24,620 - pipeline - INFO - [us-east-1] Thread finished. Total time since submit: 5.15s
+2026-07-22 12:34:24,623 - pipeline - INFO - [us-east-1] Starting metric fetching for 0 resources...
+2026-07-22 12:34:24,623 - pipeline - INFO - [us-east-1] Discovered 0 resources. Starting LLM generation...
+2026-07-22 12:34:24,628 - pipeline - INFO - [us-east-1] Garbage collection removed 0 stale/ghost records.
+2026-07-22 12:34:24,628 - pipeline - INFO - [us-east-1] Finished process_region in 5.15s
+2026-07-22 12:34:24,628 - pipeline - INFO - [us-east-1] Thread finished. Total time since submit: 5.16s
+2026-07-22 12:34:40,141 - pipeline - DEBUG - [us-east-2] execute_discovery took 20.67s
+2026-07-22 12:34:40,154 - pipeline - DEBUG - [us-east-2] DB insert discovered resources took 0.01s
+2026-07-22 12:34:40,164 - pipeline - INFO - [us-east-2] Starting metric fetching for 0 resources...
+2026-07-22 12:34:40,164 - pipeline - INFO - [us-east-2] Discovered 0 resources. Starting LLM generation...
+2026-07-22 12:34:40,186 - pipeline - INFO - [us-east-2] Garbage collection removed 42 stale/ghost records.
+2026-07-22 12:34:40,187 - pipeline - INFO - [us-east-2] Finished process_region in 20.71s
+2026-07-22 12:34:40,187 - pipeline - INFO - [us-east-2] Thread finished. Total time since submit: 20.71s
+2026-07-22 12:34:40,196 - pipeline - DEBUG - [us-east-2] execute_discovery took 20.72s
+2026-07-22 12:34:40,203 - pipeline - DEBUG - [us-east-2] DB insert discovered resources took 0.01s
+2026-07-22 12:34:40,210 - pipeline - INFO - [us-east-2] Starting metric fetching for 0 resources...
+2026-07-22 12:34:40,210 - pipeline - INFO - [us-east-2] Discovered 0 resources. Starting LLM generation...
+2026-07-22 12:34:40,219 - pipeline - INFO - [us-east-2] Garbage collection removed 0 stale/ghost records.
+2026-07-22 12:34:40,220 - pipeline - INFO - [us-east-2] Finished process_region in 20.74s
+2026-07-22 12:34:40,220 - pipeline - INFO - [us-east-2] Thread finished. Total time since submit: 20.75s
+2026-07-22 12:34:40,236 - pipeline - INFO - Finished execution_generator in 20.76s
+2026-07-22 12:49:49,152 - pipeline - INFO - Started execution_generator (execution_id=13)
+2026-07-22 12:49:49,153 - pipeline - INFO - [us-east-2] Started process_region
+2026-07-22 12:49:49,153 - pipeline - INFO - [us-east-2] Started process_region
+2026-07-22 12:49:49,153 - pipeline - INFO - [us-east-1] Started process_region
+2026-07-22 12:49:49,153 - pipeline - INFO - [us-east-1] Started process_region
+2026-07-22 12:49:53,840 - pipeline - DEBUG - [us-east-1] execute_discovery took 4.69s
+2026-07-22 12:49:53,843 - pipeline - DEBUG - [us-east-1] execute_discovery took 4.69s
+2026-07-22 12:49:53,848 - pipeline - DEBUG - [us-east-1] DB insert discovered resources took 0.01s
+2026-07-22 12:49:53,851 - pipeline - DEBUG - [us-east-1] DB insert discovered resources took 0.01s
+2026-07-22 12:49:53,855 - pipeline - INFO - [us-east-1] Starting metric fetching for 0 resources...
+2026-07-22 12:49:53,856 - pipeline - INFO - [us-east-1] Discovered 0 resources. Starting LLM generation...
+2026-07-22 12:49:53,858 - pipeline - INFO - [us-east-1] Starting metric fetching for 0 resources...
+2026-07-22 12:49:53,858 - pipeline - INFO - [us-east-1] Discovered 0 resources. Starting LLM generation...
+2026-07-22 12:49:53,865 - pipeline - INFO - [us-east-1] Garbage collection removed 0 stale/ghost records.
+2026-07-22 12:49:53,866 - pipeline - INFO - [us-east-1] Finished process_region in 4.71s
+2026-07-22 12:49:53,867 - pipeline - INFO - [us-east-1] Thread finished. Total time since submit: 4.71s
+2026-07-22 12:49:53,868 - pipeline - INFO - [us-east-1] Garbage collection removed 0 stale/ghost records.
+2026-07-22 12:49:53,868 - pipeline - INFO - [us-east-1] Finished process_region in 4.71s
+2026-07-22 12:49:53,869 - pipeline - INFO - [us-east-1] Thread finished. Total time since submit: 4.72s
+2026-07-22 12:50:09,605 - pipeline - DEBUG - [us-east-2] execute_discovery took 20.45s
+2026-07-22 12:50:09,607 - pipeline - DEBUG - [us-east-2] DB insert discovered resources took 0.00s
+2026-07-22 12:50:09,612 - pipeline - INFO - [us-east-2] Starting metric fetching for 0 resources...
+2026-07-22 12:50:09,612 - pipeline - INFO - [us-east-2] Discovered 0 resources. Starting LLM generation...
+2026-07-22 12:50:09,616 - pipeline - INFO - [us-east-2] Garbage collection removed 0 stale/ghost records.
+2026-07-22 12:50:09,617 - pipeline - INFO - [us-east-2] Finished process_region in 20.46s
+2026-07-22 12:50:09,618 - pipeline - INFO - [us-east-2] Thread finished. Total time since submit: 20.47s
+2026-07-22 12:50:09,706 - pipeline - DEBUG - [us-east-2] execute_discovery took 20.55s
+2026-07-22 12:50:09,709 - pipeline - DEBUG - [us-east-2] DB insert discovered resources took 0.00s
+2026-07-22 12:50:09,713 - pipeline - INFO - [us-east-2] Starting metric fetching for 0 resources...
+2026-07-22 12:50:09,714 - pipeline - INFO - [us-east-2] Discovered 0 resources. Starting LLM generation...
+2026-07-22 12:50:09,720 - pipeline - INFO - [us-east-2] Garbage collection removed 0 stale/ghost records.
+2026-07-22 12:50:09,720 - pipeline - INFO - [us-east-2] Finished process_region in 20.57s
+2026-07-22 12:50:09,721 - pipeline - INFO - [us-east-2] Thread finished. Total time since submit: 20.57s
+2026-07-22 12:50:09,735 - pipeline - INFO - Finished execution_generator in 20.58s
+2026-07-22 12:59:58,067 - pipeline - INFO - Started execution_generator (execution_id=14)
+2026-07-22 12:59:58,068 - pipeline - INFO - [us-east-1] Started process_region
+2026-07-22 12:59:58,068 - pipeline - INFO - [us-east-2] Started process_region
+2026-07-22 12:59:58,069 - pipeline - INFO - [us-east-1] Started process_region
+2026-07-22 12:59:58,069 - pipeline - INFO - [us-east-2] Started process_region
+2026-07-22 13:00:03,291 - pipeline - DEBUG - [us-east-1] execute_discovery took 5.22s
+2026-07-22 13:00:03,293 - pipeline - DEBUG - [us-east-1] DB insert discovered resources took 0.00s
+2026-07-22 13:00:03,300 - pipeline - INFO - [us-east-1] Starting metric fetching for 0 resources...
+2026-07-22 13:00:03,300 - pipeline - INFO - [us-east-1] Discovered 0 resources. Starting LLM generation...
+2026-07-22 13:00:03,306 - pipeline - INFO - [us-east-1] Garbage collection removed 0 stale/ghost records.
+2026-07-22 13:00:03,306 - pipeline - INFO - [us-east-1] Finished process_region in 5.24s
+2026-07-22 13:00:03,307 - pipeline - INFO - [us-east-1] Thread finished. Total time since submit: 5.24s
+2026-07-22 13:00:03,315 - pipeline - DEBUG - [us-east-1] execute_discovery took 5.25s
+2026-07-22 13:00:03,320 - pipeline - DEBUG - [us-east-1] DB insert discovered resources took 0.00s
+2026-07-22 13:00:03,327 - pipeline - INFO - [us-east-1] Starting metric fetching for 0 resources...
+2026-07-22 13:00:03,327 - pipeline - INFO - [us-east-1] Discovered 0 resources. Starting LLM generation...
+2026-07-22 13:00:03,334 - pipeline - INFO - [us-east-1] Garbage collection removed 0 stale/ghost records.
+2026-07-22 13:00:03,334 - pipeline - INFO - [us-east-1] Finished process_region in 5.27s
+2026-07-22 13:00:03,335 - pipeline - INFO - [us-east-1] Thread finished. Total time since submit: 5.27s
+2026-07-22 13:00:04,012 - pipeline - DEBUG - [us-east-2] execute_discovery took 5.94s
+2026-07-22 13:00:04,023 - pipeline - DEBUG - [us-east-2] execute_discovery took 5.95s
+2026-07-22 13:00:04,046 - pipeline - DEBUG - [us-east-2] DB insert discovered resources took 0.03s
+2026-07-22 13:00:04,055 - pipeline - INFO - [us-east-2] Starting metric fetching for 42 resources...
+2026-07-22 13:00:04,077 - pipeline - DEBUG - [us-east-2] DB insert discovered resources took 0.05s
+2026-07-22 13:00:04,108 - pipeline - INFO - [us-east-2] Starting metric fetching for 42 resources...
+2026-07-22 13:00:07,903 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for compute-optimizer-alerts took 3.85s
+2026-07-22 13:00:07,936 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for compute-optimizer-alerts took 3.83s
+2026-07-22 13:00:11,324 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for stop-ec2-instance-capstone took 3.42s
+2026-07-22 13:00:11,346 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for stop-ec2-instance-capstone took 3.41s
+2026-07-22 13:00:14,716 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for start-ec2-instance-capstone took 3.39s
+2026-07-22 13:00:14,724 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for start-ec2-instance-capstone took 3.38s
+2026-07-22 13:00:17,864 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for AUTO-EC2-START took 3.14s
+2026-07-22 13:00:17,886 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for AUTO-EC2-START took 3.17s
+2026-07-22 13:00:21,257 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for Onboarding took 3.37s
+2026-07-22 13:00:21,286 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for Onboarding took 3.42s
+2026-07-22 13:00:24,417 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for cwsyn-qa-statuspage-7e44027a-84ab-4f7c-9ec2-e153da1d5d14 took 3.16s
+2026-07-22 13:00:24,428 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for cwsyn-qa-statuspage-7e44027a-84ab-4f7c-9ec2-e153da1d5d14 took 3.14s
+2026-07-22 13:00:27,632 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for SRE_CloudTrialEventCreate_Notifier took 3.21s
+2026-07-22 13:00:27,646 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for SRE_CloudTrialEventCreate_Notifier took 3.22s
+2026-07-22 13:00:32,325 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for healthchk-an took 4.69s
+2026-07-22 13:00:32,327 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for healthchk-an took 4.68s
+2026-07-22 13:00:36,300 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for send_email took 3.97s
+2026-07-22 13:00:36,333 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for send_email took 4.01s
+2026-07-22 13:00:39,507 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for Alertnow-POC-SRE took 3.21s
+2026-07-22 13:00:39,516 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for Alertnow-POC-SRE took 3.18s
+2026-07-22 13:00:42,762 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for SRE_CloudTrialEventCreate_Delete_Notifier took 3.25s
+2026-07-22 13:00:42,763 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for SRE_CloudTrialEventCreate_Delete_Notifier took 3.25s
+2026-07-22 13:00:47,431 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for ChronivaCalendarAccessToken_cron took 4.67s
+2026-07-22 13:00:47,433 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for ChronivaCalendarAccessToken_cron took 4.67s
+2026-07-22 13:00:50,711 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for QA-CD-Webiste-Stop took 3.28s
+2026-07-22 13:00:50,713 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for QA-CD-Webiste-Stop took 3.28s
+2026-07-22 13:00:53,838 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for AUTO-EC2-STOP took 3.13s
+2026-07-22 13:00:53,864 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for AUTO-EC2-STOP took 3.15s
+2026-07-22 13:00:57,595 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for AlertingFrameworkSetup-AlertingLambda-tWzEYtrKW0pc took 3.73s
+2026-07-22 13:00:57,599 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for AlertingFrameworkSetup-AlertingLambda-tWzEYtrKW0pc took 3.76s
+2026-07-22 13:01:01,708 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for cwsyn-qa-statuspage-459724ba-5c38-4fbb-8443-a3a9b1eeb516 took 4.11s
+2026-07-22 13:01:01,721 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for cwsyn-qa-statuspage-459724ba-5c38-4fbb-8443-a3a9b1eeb516 took 4.12s
+2026-07-22 13:01:05,305 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for RSA_Archer_Lamdafn took 3.60s
+2026-07-22 13:01:05,311 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for RSA_Archer_Lamdafn took 3.59s
+2026-07-22 13:01:08,819 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for caregiver took 3.51s
+2026-07-22 13:01:08,829 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for caregiver took 3.52s
+2026-07-22 13:01:14,304 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for IB_Linux_3_10 took 5.47s
+2026-07-22 13:01:14,314 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for IB_Linux_3_10 took 5.49s
+2026-07-22 13:01:17,889 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for SRE_AWS_CloudwatchAlarms took 3.59s
+2026-07-22 13:01:17,891 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for SRE_AWS_CloudwatchAlarms took 3.58s
+2026-07-22 13:01:20,963 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for QA-CD-Webiste-Start took 3.07s
+2026-07-22 13:01:21,015 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for QA-CD-Webiste-Start took 3.12s
+2026-07-22 13:01:23,990 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for cwsyn-qa-statuspage-7b66c9e8-34fe-4f47-80cf-8cce0389c7b4 took 3.03s
+2026-07-22 13:01:23,995 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for cwsyn-qa-statuspage-7b66c9e8-34fe-4f47-80cf-8cce0389c7b4 took 2.98s
+2026-07-22 13:01:27,012 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for Scan-My-Cloud-CUR-Data took 3.02s
+2026-07-22 13:01:27,017 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for Scan-My-Cloud-CUR-Data took 3.02s
+2026-07-22 13:01:30,727 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for EC2-AUTO-STOP took 3.71s
+2026-07-22 13:01:30,787 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for EC2-AUTO-STOP took 3.77s
+2026-07-22 13:01:33,593 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for log-group-cleanup-checker took 2.87s
+2026-07-22 13:01:33,600 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for log-group-cleanup-checker took 2.81s
+2026-07-22 13:01:36,443 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for SRE_UnusedIAM took 2.84s
+2026-07-22 13:01:36,485 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for SRE_UnusedIAM took 2.89s
+2026-07-22 13:01:39,933 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for baseline-overrides-8941-818am took 3.45s
+2026-07-22 13:01:40,035 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for baseline-overrides-8941-818am took 3.59s
+2026-07-22 13:01:42,850 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for serverlessrepo-cloudwatch-cloudwatchlogsprocessdat-1U5J1MA13132U took 2.81s
+2026-07-22 13:01:42,901 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for serverlessrepo-cloudwatch-cloudwatchlogsprocessdat-1U5J1MA13132U took 2.97s
+2026-07-22 13:01:45,890 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for compute_optimizer took 2.99s
+2026-07-22 13:01:45,897 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for compute_optimizer took 3.05s
+2026-07-22 13:01:48,940 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for EBS-Volume-Report took 3.04s
+2026-07-22 13:01:48,956 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for EBS-Volume-Report took 3.07s
+2026-07-22 13:01:51,685 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for delete-name-tags-us-east-2-8941-818am took 2.73s
+2026-07-22 13:01:51,687 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for delete-name-tags-us-east-2-8941-818am took 2.75s
+2026-07-22 13:01:54,838 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for S3_Lifecycle_audit took 3.15s
+2026-07-22 13:01:54,845 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for S3_Lifecycle_audit took 3.16s
+2026-07-22 13:01:57,685 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for cwsyn-qa-statuspage-3b7c2d0c-efa8-4abb-8a8b-a9d1933f8257 took 2.84s
+2026-07-22 13:01:57,707 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for cwsyn-qa-statuspage-3b7c2d0c-efa8-4abb-8a8b-a9d1933f8257 took 2.87s
+2026-07-22 13:02:00,620 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for cwsyn-qa-statuspage-a00d08b3-4afb-4f30-b3f9-f39eae96c3ca took 2.93s
+2026-07-22 13:02:00,623 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for cwsyn-qa-statuspage-a00d08b3-4afb-4f30-b3f9-f39eae96c3ca took 2.92s
+2026-07-22 13:02:04,005 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for cloudwatch-to-slack took 3.39s
+2026-07-22 13:02:04,031 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for cloudwatch-to-slack took 3.41s
+2026-07-22 13:02:07,355 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for conclaveai-imagedetection took 3.32s
+2026-07-22 13:02:07,356 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for conclaveai-imagedetection took 3.35s
+2026-07-22 13:02:10,721 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for cwsyn-qa-statuspage-3ca49fd4-cce5-4608-96ab-d421b921f2b6 took 3.37s
+2026-07-22 13:02:10,768 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for cwsyn-qa-statuspage-3ca49fd4-cce5-4608-96ab-d421b921f2b6 took 3.41s
+2026-07-22 13:02:14,295 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for s3_storage_lens_parser took 3.57s
+2026-07-22 13:02:14,298 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for s3_storage_lens_parser took 3.53s
+2026-07-22 13:02:18,295 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for SecurityHubToTeams took 4.00s
+2026-07-22 13:02:18,298 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for SecurityHubToTeams took 4.00s
+2026-07-22 13:02:21,542 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for RSA_Lamda_Start took 3.24s
+2026-07-22 13:02:21,553 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for RSA_Lamda_Start took 3.26s
+2026-07-22 13:02:25,401 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for EC2-AUTO-START took 3.86s
+2026-07-22 13:02:25,402 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for EC2-AUTO-START took 3.85s
+2026-07-22 13:02:29,330 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for cwsyn-qa-statuspage-d3bf3bcc-1939-4151-8d44-8e2b906b6b63 took 3.93s
+2026-07-22 13:02:29,331 - pipeline - INFO - [us-east-2] Discovered 42 resources. Starting LLM generation...
+2026-07-22 13:02:29,344 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for cwsyn-qa-statuspage-d3bf3bcc-1939-4151-8d44-8e2b906b6b63 took 3.94s
+2026-07-22 13:02:29,345 - pipeline - INFO - [us-east-2] Discovered 42 resources. Starting LLM generation...
+2026-07-22 13:02:29,458 - pipeline - INFO - [us-east-2] Batch of 2 finished in 0.12s
+2026-07-22 13:02:29,495 - pipeline - INFO - [us-east-2] Batch of 5 finished in 0.16s
+2026-07-22 13:02:29,517 - pipeline - INFO - [us-east-2] Batch of 2 finished in 0.17s
+2026-07-22 13:02:29,532 - pipeline - INFO - [us-east-2] Batch of 5 finished in 0.18s
+2026-07-22 13:02:29,548 - pipeline - INFO - [us-east-2] Batch of 5 finished in 0.21s
+2026-07-22 13:02:29,569 - pipeline - INFO - [us-east-2] Batch of 5 finished in 0.24s
+2026-07-22 13:02:29,580 - pipeline - INFO - [us-east-2] Batch of 5 finished in 0.23s
+2026-07-22 13:02:29,598 - pipeline - INFO - [us-east-2] Batch of 5 finished in 0.25s
+2026-07-22 13:02:29,614 - pipeline - INFO - [us-east-2] Batch of 5 finished in 0.27s
+2026-07-22 13:02:29,630 - pipeline - INFO - [us-east-2] Batch of 5 finished in 0.28s
+2026-07-22 13:02:29,654 - pipeline - INFO - [us-east-2] Batch of 5 finished in 0.32s
+2026-07-22 13:02:29,664 - pipeline - INFO - [us-east-2] Batch of 5 finished in 0.33s
+2026-07-22 13:02:29,680 - pipeline - INFO - [us-east-2] Batch of 5 finished in 0.35s
+2026-07-22 13:02:29,697 - pipeline - INFO - [us-east-2] Batch of 5 finished in 0.35s
+2026-07-22 13:02:29,715 - pipeline - INFO - [us-east-2] Batch of 5 finished in 0.38s
+2026-07-22 13:02:29,782 - pipeline - INFO - [us-east-2] Batch of 5 finished in 0.43s
+2026-07-22 13:02:29,799 - pipeline - INFO - [us-east-2] Batch of 5 finished in 0.45s
+2026-07-22 13:02:29,805 - pipeline - INFO - [us-east-2] Garbage collection removed 0 stale/ghost records.
+2026-07-22 13:02:29,805 - pipeline - INFO - [us-east-2] Finished process_region in 151.74s
+2026-07-22 13:02:29,807 - pipeline - INFO - [us-east-2] Thread finished. Total time since submit: 151.74s
+2026-07-22 13:02:29,815 - pipeline - INFO - [us-east-2] Batch of 5 finished in 0.48s
+2026-07-22 13:02:29,821 - pipeline - INFO - [us-east-2] Garbage collection removed 0 stale/ghost records.
+2026-07-22 13:02:29,821 - pipeline - INFO - [us-east-2] Finished process_region in 151.75s
+2026-07-22 13:02:29,822 - pipeline - INFO - [us-east-2] Thread finished. Total time since submit: 151.75s
+2026-07-22 13:02:29,834 - pipeline - INFO - Finished execution_generator in 151.77s
+2026-07-22 13:07:12,025 - pipeline - INFO - Started execution_generator (execution_id=15)
+2026-07-22 13:07:12,026 - pipeline - INFO - [us-east-2] Started process_region
+2026-07-22 13:07:12,026 - pipeline - INFO - [us-east-2] Started process_region
+2026-07-22 13:07:12,026 - pipeline - INFO - [us-east-1] Started process_region
+2026-07-22 13:07:12,027 - pipeline - INFO - [us-east-1] Started process_region
+2026-07-22 13:07:16,590 - pipeline - DEBUG - [us-east-1] execute_discovery took 4.56s
+2026-07-22 13:07:16,595 - pipeline - DEBUG - [us-east-1] DB insert discovered resources took 0.00s
+2026-07-22 13:07:16,603 - pipeline - INFO - [us-east-1] Starting metric fetching for 0 resources...
+2026-07-22 13:07:16,605 - pipeline - DEBUG - [us-east-1] execute_discovery took 4.58s
+2026-07-22 13:07:16,605 - pipeline - INFO - [us-east-1] Discovered 0 resources. Starting LLM generation...
+2026-07-22 13:07:16,615 - pipeline - DEBUG - [us-east-1] DB insert discovered resources took 0.01s
+2026-07-22 13:07:16,616 - pipeline - INFO - [us-east-1] Garbage collection removed 0 stale/ghost records.
+2026-07-22 13:07:16,616 - pipeline - INFO - [us-east-1] Finished process_region in 4.59s
+2026-07-22 13:07:16,617 - pipeline - INFO - [us-east-1] Thread finished. Total time since submit: 4.59s
+2026-07-22 13:07:16,622 - pipeline - INFO - [us-east-1] Starting metric fetching for 0 resources...
+2026-07-22 13:07:16,622 - pipeline - INFO - [us-east-1] Discovered 0 resources. Starting LLM generation...
+2026-07-22 13:07:16,630 - pipeline - INFO - [us-east-1] Garbage collection removed 0 stale/ghost records.
+2026-07-22 13:07:16,630 - pipeline - INFO - [us-east-1] Finished process_region in 4.60s
+2026-07-22 13:07:16,631 - pipeline - INFO - [us-east-1] Thread finished. Total time since submit: 4.60s
+2026-07-22 13:07:17,234 - pipeline - DEBUG - [us-east-2] execute_discovery took 5.21s
+2026-07-22 13:07:17,255 - pipeline - DEBUG - [us-east-2] DB insert discovered resources took 0.02s
+2026-07-22 13:07:17,262 - pipeline - INFO - [us-east-2] Starting metric fetching for 42 resources...
+2026-07-22 13:07:17,348 - pipeline - DEBUG - [us-east-2] execute_discovery took 5.32s
+2026-07-22 13:07:17,363 - pipeline - DEBUG - [us-east-2] DB insert discovered resources took 0.01s
+2026-07-22 13:07:17,369 - pipeline - INFO - [us-east-2] Starting metric fetching for 42 resources...
+2026-07-22 13:07:22,757 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for compute-optimizer-alerts took 5.39s
+2026-07-22 13:07:22,765 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for compute-optimizer-alerts took 5.50s
+2026-07-22 13:07:22,784 - pipeline - DEBUG - [us-east-2] save_metric_points for compute-optimizer-alerts took 0.02s
+2026-07-22 13:07:22,946 - pipeline - DEBUG - [us-east-2] save_metric_points for compute-optimizer-alerts took 0.18s
+2026-07-22 13:07:28,144 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for stop-ec2-instance-capstone took 5.36s
+2026-07-22 13:07:28,162 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for stop-ec2-instance-capstone took 5.22s
+2026-07-22 13:07:33,442 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for start-ec2-instance-capstone took 5.28s
+2026-07-22 13:07:33,460 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for start-ec2-instance-capstone took 5.31s
+2026-07-22 13:07:38,730 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for AUTO-EC2-START took 5.29s
+2026-07-22 13:07:38,731 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for AUTO-EC2-START took 5.27s
+2026-07-22 13:07:38,751 - pipeline - DEBUG - [us-east-2] save_metric_points for AUTO-EC2-START took 0.02s
+2026-07-22 13:07:38,763 - pipeline - DEBUG - [us-east-2] save_metric_points for AUTO-EC2-START took 0.03s
+2026-07-22 13:07:44,231 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for Onboarding took 5.48s
+2026-07-22 13:07:44,247 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for Onboarding took 5.48s
+2026-07-22 13:07:49,260 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for cwsyn-qa-statuspage-7e44027a-84ab-4f7c-9ec2-e153da1d5d14 took 5.01s
+2026-07-22 13:07:49,315 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for cwsyn-qa-statuspage-7e44027a-84ab-4f7c-9ec2-e153da1d5d14 took 5.08s
+2026-07-22 13:07:54,430 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for SRE_CloudTrialEventCreate_Notifier took 5.12s
+2026-07-22 13:07:54,441 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for SRE_CloudTrialEventCreate_Notifier took 5.18s
+2026-07-22 13:07:59,448 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for healthchk-an took 5.01s
+2026-07-22 13:07:59,561 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for healthchk-an took 5.13s
+2026-07-22 13:08:04,551 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for send_email took 5.10s
+2026-07-22 13:08:04,553 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for send_email took 4.99s
+2026-07-22 13:08:11,206 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for Alertnow-POC-SRE took 6.66s
+2026-07-22 13:08:11,229 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for Alertnow-POC-SRE took 6.68s
+2026-07-22 13:08:18,387 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for SRE_CloudTrialEventCreate_Delete_Notifier took 7.18s
+2026-07-22 13:08:18,406 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for SRE_CloudTrialEventCreate_Delete_Notifier took 7.18s
+2026-07-22 13:08:26,204 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for ChronivaCalendarAccessToken_cron took 7.80s
+2026-07-22 13:08:26,303 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for ChronivaCalendarAccessToken_cron took 7.92s
+2026-07-22 13:08:26,462 - pipeline - DEBUG - [us-east-2] save_metric_points for ChronivaCalendarAccessToken_cron took 0.25s
+2026-07-22 13:08:26,697 - pipeline - DEBUG - [us-east-2] save_metric_points for ChronivaCalendarAccessToken_cron took 0.39s
+2026-07-22 13:08:32,471 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for QA-CD-Webiste-Stop took 5.77s
+2026-07-22 13:08:32,500 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for QA-CD-Webiste-Stop took 6.04s
+2026-07-22 13:08:32,509 - pipeline - DEBUG - [us-east-2] save_metric_points for QA-CD-Webiste-Stop took 0.04s
+2026-07-22 13:08:32,538 - pipeline - DEBUG - [us-east-2] save_metric_points for QA-CD-Webiste-Stop took 0.04s
+2026-07-22 13:08:38,798 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for AUTO-EC2-STOP took 6.26s
+2026-07-22 13:08:38,818 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for AUTO-EC2-STOP took 6.31s
+2026-07-22 13:08:38,818 - pipeline - DEBUG - [us-east-2] save_metric_points for AUTO-EC2-STOP took 0.02s
+2026-07-22 13:08:38,871 - pipeline - DEBUG - [us-east-2] save_metric_points for AUTO-EC2-STOP took 0.05s
+2026-07-22 13:08:44,885 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for AlertingFrameworkSetup-AlertingLambda-tWzEYtrKW0pc took 6.07s
+2026-07-22 13:08:45,013 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for AlertingFrameworkSetup-AlertingLambda-tWzEYtrKW0pc took 6.14s
+2026-07-22 13:08:45,056 - pipeline - DEBUG - [us-east-2] save_metric_points for AlertingFrameworkSetup-AlertingLambda-tWzEYtrKW0pc took 0.17s
+2026-07-22 13:08:45,174 - pipeline - DEBUG - [us-east-2] save_metric_points for AlertingFrameworkSetup-AlertingLambda-tWzEYtrKW0pc took 0.16s
+2026-07-22 13:08:50,461 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for cwsyn-qa-statuspage-459724ba-5c38-4fbb-8443-a3a9b1eeb516 took 5.41s
+2026-07-22 13:08:50,511 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for cwsyn-qa-statuspage-459724ba-5c38-4fbb-8443-a3a9b1eeb516 took 5.34s
+2026-07-22 13:08:56,345 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for RSA_Archer_Lamdafn took 5.83s
+2026-07-22 13:08:56,897 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for RSA_Archer_Lamdafn took 6.44s
+2026-07-22 13:09:01,664 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for caregiver took 5.32s
+2026-07-22 13:09:02,374 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for caregiver took 5.48s
+2026-07-22 13:09:07,151 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for IB_Linux_3_10 took 5.49s
+2026-07-22 13:09:08,374 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for IB_Linux_3_10 took 6.00s
+2026-07-22 13:09:12,230 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for SRE_AWS_CloudwatchAlarms took 5.08s
+2026-07-22 13:09:13,553 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for SRE_AWS_CloudwatchAlarms took 5.18s
+2026-07-22 13:09:17,249 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for QA-CD-Webiste-Start took 5.02s
+2026-07-22 13:09:17,270 - pipeline - DEBUG - [us-east-2] save_metric_points for QA-CD-Webiste-Start took 0.02s
+2026-07-22 13:09:18,774 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for QA-CD-Webiste-Start took 5.22s
+2026-07-22 13:09:18,804 - pipeline - DEBUG - [us-east-2] save_metric_points for QA-CD-Webiste-Start took 0.03s
+2026-07-22 13:09:23,161 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for cwsyn-qa-statuspage-7b66c9e8-34fe-4f47-80cf-8cce0389c7b4 took 5.89s
+2026-07-22 13:09:24,751 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for cwsyn-qa-statuspage-7b66c9e8-34fe-4f47-80cf-8cce0389c7b4 took 5.95s
+2026-07-22 13:09:28,972 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for Scan-My-Cloud-CUR-Data took 5.81s
+2026-07-22 13:09:30,546 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for Scan-My-Cloud-CUR-Data took 5.80s
+2026-07-22 13:09:35,091 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for EC2-AUTO-STOP took 6.12s
+2026-07-22 13:09:35,113 - pipeline - DEBUG - [us-east-2] save_metric_points for EC2-AUTO-STOP took 0.02s
+2026-07-22 13:09:36,748 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for EC2-AUTO-STOP took 6.20s
+2026-07-22 13:09:36,786 - pipeline - DEBUG - [us-east-2] save_metric_points for EC2-AUTO-STOP took 0.04s
+2026-07-22 13:09:41,545 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for log-group-cleanup-checker took 6.43s
+2026-07-22 13:09:43,009 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for log-group-cleanup-checker took 6.22s
+2026-07-22 13:09:47,526 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for SRE_UnusedIAM took 5.98s
+2026-07-22 13:09:49,095 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for SRE_UnusedIAM took 6.09s
+2026-07-22 13:09:55,097 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for baseline-overrides-8941-818am took 7.57s
+2026-07-22 13:09:55,264 - pipeline - DEBUG - [us-east-2] save_metric_points for baseline-overrides-8941-818am took 0.17s
+2026-07-22 13:09:56,844 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for baseline-overrides-8941-818am took 7.75s
+2026-07-22 13:09:57,168 - pipeline - DEBUG - [us-east-2] save_metric_points for baseline-overrides-8941-818am took 0.32s
+2026-07-22 13:10:02,152 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for serverlessrepo-cloudwatch-cloudwatchlogsprocessdat-1U5J1MA13132U took 6.89s
+2026-07-22 13:10:03,677 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for serverlessrepo-cloudwatch-cloudwatchlogsprocessdat-1U5J1MA13132U took 6.51s
+2026-07-22 13:10:07,223 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for compute_optimizer took 5.07s
+2026-07-22 13:10:09,097 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for compute_optimizer took 5.42s
+2026-07-22 13:10:13,646 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for EBS-Volume-Report took 6.42s
+2026-07-22 13:10:15,371 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for EBS-Volume-Report took 6.27s
+2026-07-22 13:10:18,859 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for delete-name-tags-us-east-2-8941-818am took 5.21s
+2026-07-22 13:10:20,823 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for delete-name-tags-us-east-2-8941-818am took 5.45s
+2026-07-22 13:10:23,978 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for S3_Lifecycle_audit took 5.12s
+2026-07-22 13:10:25,871 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for S3_Lifecycle_audit took 5.05s
+2026-07-22 13:10:29,216 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for cwsyn-qa-statuspage-3b7c2d0c-efa8-4abb-8a8b-a9d1933f8257 took 5.24s
+2026-07-22 13:10:30,936 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for cwsyn-qa-statuspage-3b7c2d0c-efa8-4abb-8a8b-a9d1933f8257 took 5.06s
+2026-07-22 13:10:34,396 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for cwsyn-qa-statuspage-a00d08b3-4afb-4f30-b3f9-f39eae96c3ca took 5.18s
+2026-07-22 13:10:36,294 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for cwsyn-qa-statuspage-a00d08b3-4afb-4f30-b3f9-f39eae96c3ca took 5.36s
+2026-07-22 13:10:39,498 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for cloudwatch-to-slack took 5.10s
+2026-07-22 13:10:41,481 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for cloudwatch-to-slack took 5.19s
+2026-07-22 13:10:44,639 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for conclaveai-imagedetection took 5.14s
+2026-07-22 13:10:46,518 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for conclaveai-imagedetection took 5.04s
+2026-07-22 13:10:49,834 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for cwsyn-qa-statuspage-3ca49fd4-cce5-4608-96ab-d421b921f2b6 took 5.19s
+2026-07-22 13:10:51,777 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for cwsyn-qa-statuspage-3ca49fd4-cce5-4608-96ab-d421b921f2b6 took 5.26s
+2026-07-22 13:10:55,093 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for s3_storage_lens_parser took 5.26s
+2026-07-22 13:10:55,115 - pipeline - DEBUG - [us-east-2] save_metric_points for s3_storage_lens_parser took 0.02s
+2026-07-22 13:10:57,442 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for s3_storage_lens_parser took 5.66s
+2026-07-22 13:10:57,462 - pipeline - DEBUG - [us-east-2] save_metric_points for s3_storage_lens_parser took 0.02s
+2026-07-22 13:11:01,777 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for SecurityHubToTeams took 6.66s
+2026-07-22 13:11:01,893 - pipeline - DEBUG - [us-east-2] save_metric_points for SecurityHubToTeams took 0.12s
+2026-07-22 13:11:03,702 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for SecurityHubToTeams took 6.24s
+2026-07-22 13:11:03,838 - pipeline - DEBUG - [us-east-2] save_metric_points for SecurityHubToTeams took 0.14s
+2026-07-22 13:11:07,219 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for RSA_Lamda_Start took 5.33s
+2026-07-22 13:11:09,195 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for RSA_Lamda_Start took 5.36s
+2026-07-22 13:11:13,751 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for EC2-AUTO-START took 6.53s
+2026-07-22 13:11:13,767 - pipeline - DEBUG - [us-east-2] save_metric_points for EC2-AUTO-START took 0.02s
+2026-07-22 13:11:15,299 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for EC2-AUTO-START took 6.10s
+2026-07-22 13:11:15,316 - pipeline - DEBUG - [us-east-2] save_metric_points for EC2-AUTO-START took 0.02s
+2026-07-22 13:11:18,591 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for cwsyn-qa-statuspage-d3bf3bcc-1939-4151-8d44-8e2b906b6b63 took 4.82s
+2026-07-22 13:11:18,591 - pipeline - INFO - [us-east-2] Discovered 42 resources. Starting LLM generation...
+2026-07-22 13:11:18,729 - pipeline - INFO - [us-east-2] Batch of 5 finished in 0.14s
+2026-07-22 13:11:18,795 - pipeline - INFO - [us-east-2] Batch of 5 finished in 0.20s
+2026-07-22 13:11:18,859 - pipeline - INFO - [us-east-2] Batch of 5 finished in 0.27s
+2026-07-22 13:11:21,000 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for cwsyn-qa-statuspage-d3bf3bcc-1939-4151-8d44-8e2b906b6b63 took 5.68s
+2026-07-22 13:11:21,000 - pipeline - INFO - [us-east-2] Discovered 42 resources. Starting LLM generation...
+2026-07-22 13:11:21,159 - pipeline - INFO - [us-east-2] Batch of 5 finished in 0.16s
+2026-07-22 13:11:21,294 - pipeline - INFO - [us-east-2] Batch of 5 finished in 0.29s
+2026-07-22 13:11:21,432 - pipeline - INFO - [us-east-2] Batch of 5 finished in 0.42s
+2026-07-22 13:12:24,737 - pipeline - ERROR - [us-east-2] LLM API failed for batch: Bedrock API call failed. Last error: An error occurred (UnrecognizedClientException) when calling the Converse operation: The security token included in the request is invalid.
+2026-07-22 13:12:24,738 - pipeline - ERROR - Error parsing bulk LLM response: Expecting value: line 1 column 1 (char 0). Raw response: Bedrock API call failed. Last error: An error occurred (UnrecognizedClientException) when calling the Converse operation: The security token included in the request is invalid.
+2026-07-22 13:12:24,739 - pipeline - ERROR - [us-east-2] LLM API failed for batch: Bedrock API call failed. Last error: An error occurred (UnrecognizedClientException) when calling the Converse operation: The security token included in the request is invalid.
+2026-07-22 13:12:24,740 - pipeline - ERROR - Error parsing bulk LLM response: Expecting value: line 1 column 1 (char 0). Raw response: Bedrock API call failed. Last error: An error occurred (UnrecognizedClientException) when calling the Converse operation: The security token included in the request is invalid.
+2026-07-22 13:12:24,750 - pipeline - ERROR - [us-east-2] LLM API failed for batch: Bedrock API call failed. Last error: An error occurred (UnrecognizedClientException) when calling the Converse operation: The security token included in the request is invalid.
+2026-07-22 13:12:24,751 - pipeline - ERROR - Error parsing bulk LLM response: Expecting value: line 1 column 1 (char 0). Raw response: Bedrock API call failed. Last error: An error occurred (UnrecognizedClientException) when calling the Converse operation: The security token included in the request is invalid.
+2026-07-22 13:12:24,769 - pipeline - INFO - [us-east-2] Batch of 2 finished in 66.17s
+2026-07-22 13:12:24,794 - pipeline - INFO - [us-east-2] Batch of 5 finished in 66.20s
+2026-07-22 13:12:24,808 - pipeline - INFO - [us-east-2] Batch of 5 finished in 66.21s
+2026-07-22 13:12:27,209 - pipeline - ERROR - [us-east-2] LLM API failed for batch: Bedrock API call failed. Last error: An error occurred (UnrecognizedClientException) when calling the Converse operation: The security token included in the request is invalid.
+2026-07-22 13:12:27,210 - pipeline - ERROR - [us-east-2] LLM API failed for batch: Bedrock API call failed. Last error: An error occurred (UnrecognizedClientException) when calling the Converse operation: The security token included in the request is invalid.
+2026-07-22 13:12:27,210 - pipeline - ERROR - Error parsing bulk LLM response: Expecting value: line 1 column 1 (char 0). Raw response: Bedrock API call failed. Last error: An error occurred (UnrecognizedClientException) when calling the Converse operation: The security token included in the request is invalid.
+2026-07-22 13:12:27,211 - pipeline - ERROR - Error parsing bulk LLM response: Expecting value: line 1 column 1 (char 0). Raw response: Bedrock API call failed. Last error: An error occurred (UnrecognizedClientException) when calling the Converse operation: The security token included in the request is invalid.
+2026-07-22 13:12:27,213 - pipeline - ERROR - [us-east-2] LLM API failed for batch: Bedrock API call failed. Last error: An error occurred (UnrecognizedClientException) when calling the Converse operation: The security token included in the request is invalid.
+2026-07-22 13:12:27,213 - pipeline - ERROR - [us-east-2] LLM API failed for batch: Bedrock API call failed. Last error: An error occurred (UnrecognizedClientException) when calling the Converse operation: The security token included in the request is invalid.
+2026-07-22 13:12:27,214 - pipeline - ERROR - Error parsing bulk LLM response: Expecting value: line 1 column 1 (char 0). Raw response: Bedrock API call failed. Last error: An error occurred (UnrecognizedClientException) when calling the Converse operation: The security token included in the request is invalid.
+2026-07-22 13:12:27,214 - pipeline - ERROR - [us-east-2] LLM API failed for batch: Bedrock API call failed. Last error: An error occurred (UnrecognizedClientException) when calling the Converse operation: The security token included in the request is invalid.
+2026-07-22 13:12:27,215 - pipeline - ERROR - [us-east-2] LLM API failed for batch: Bedrock API call failed. Last error: An error occurred (UnrecognizedClientException) when calling the Converse operation: The security token included in the request is invalid.
+2026-07-22 13:12:27,215 - pipeline - ERROR - Error parsing bulk LLM response: Expecting value: line 1 column 1 (char 0). Raw response: Bedrock API call failed. Last error: An error occurred (UnrecognizedClientException) when calling the Converse operation: The security token included in the request is invalid.
+2026-07-22 13:12:27,215 - pipeline - ERROR - [us-east-2] LLM API failed for batch: Bedrock API call failed. Last error: An error occurred (UnrecognizedClientException) when calling the Converse operation: The security token included in the request is invalid.
+2026-07-22 13:12:27,216 - pipeline - ERROR - [us-east-2] LLM API failed for batch: Bedrock API call failed. Last error: An error occurred (UnrecognizedClientException) when calling the Converse operation: The security token included in the request is invalid.
+2026-07-22 13:12:27,216 - pipeline - ERROR - [us-east-2] LLM API failed for batch: Bedrock API call failed. Last error: An error occurred (UnrecognizedClientException) when calling the Converse operation: The security token included in the request is invalid.
+2026-07-22 13:12:27,218 - pipeline - ERROR - Error parsing bulk LLM response: Expecting value: line 1 column 1 (char 0). Raw response: Bedrock API call failed. Last error: An error occurred (UnrecognizedClientException) when calling the Converse operation: The security token included in the request is invalid.
+2026-07-22 13:12:27,218 - pipeline - ERROR - Error parsing bulk LLM response: Expecting value: line 1 column 1 (char 0). Raw response: Bedrock API call failed. Last error: An error occurred (UnrecognizedClientException) when calling the Converse operation: The security token included in the request is invalid.
+2026-07-22 13:12:27,219 - pipeline - ERROR - Error parsing bulk LLM response: Expecting value: line 1 column 1 (char 0). Raw response: Bedrock API call failed. Last error: An error occurred (UnrecognizedClientException) when calling the Converse operation: The security token included in the request is invalid.
+2026-07-22 13:12:27,220 - pipeline - ERROR - Error parsing bulk LLM response: Expecting value: line 1 column 1 (char 0). Raw response: Bedrock API call failed. Last error: An error occurred (UnrecognizedClientException) when calling the Converse operation: The security token included in the request is invalid.
+2026-07-22 13:12:27,220 - pipeline - ERROR - Error parsing bulk LLM response: Expecting value: line 1 column 1 (char 0). Raw response: Bedrock API call failed. Last error: An error occurred (UnrecognizedClientException) when calling the Converse operation: The security token included in the request is invalid.
+2026-07-22 13:12:27,250 - pipeline - INFO - [us-east-2] Batch of 5 finished in 66.23s
+2026-07-22 13:12:27,277 - pipeline - INFO - [us-east-2] Batch of 5 finished in 68.69s
+2026-07-22 13:12:27,291 - pipeline - INFO - [us-east-2] Batch of 5 finished in 68.70s
+2026-07-22 13:12:27,308 - pipeline - INFO - [us-east-2] Batch of 5 finished in 66.30s
+2026-07-22 13:12:27,324 - pipeline - INFO - [us-east-2] Batch of 5 finished in 68.73s
+2026-07-22 13:12:27,340 - pipeline - INFO - [us-east-2] Batch of 5 finished in 66.34s
+2026-07-22 13:12:27,357 - pipeline - INFO - [us-east-2] Batch of 5 finished in 66.35s
+2026-07-22 13:12:27,364 - pipeline - INFO - [us-east-2] Garbage collection removed 0 stale/ghost records.
+2026-07-22 13:12:27,364 - pipeline - INFO - [us-east-2] Finished process_region in 315.34s
+2026-07-22 13:12:27,365 - pipeline - INFO - [us-east-2] Thread finished. Total time since submit: 315.34s
+2026-07-22 13:12:27,406 - pipeline - INFO - [us-east-2] Batch of 5 finished in 66.40s
+2026-07-22 13:12:27,439 - pipeline - INFO - [us-east-2] Batch of 2 finished in 66.42s
+2026-07-22 13:12:27,447 - pipeline - INFO - [us-east-2] Garbage collection removed 0 stale/ghost records.
+2026-07-22 13:12:27,447 - pipeline - INFO - [us-east-2] Finished process_region in 315.42s
+2026-07-22 13:12:27,448 - pipeline - INFO - [us-east-2] Thread finished. Total time since submit: 315.42s
+2026-07-22 13:12:27,460 - pipeline - INFO - Finished execution_generator in 315.43s
+2026-07-22 14:23:08,664 - pipeline - INFO - Started execution_generator (execution_id=16)
+2026-07-22 14:23:08,665 - pipeline - INFO - [us-east-1] Started process_region
+2026-07-22 14:23:08,666 - pipeline - INFO - [us-east-2] Started process_region
+2026-07-22 14:23:08,667 - pipeline - INFO - [us-east-1] Started process_region
+2026-07-22 14:23:08,668 - pipeline - INFO - [us-east-2] Started process_region
+2026-07-22 14:23:13,196 - pipeline - DEBUG - [us-east-1] execute_discovery took 4.53s
+2026-07-22 14:23:13,202 - pipeline - DEBUG - [us-east-1] DB insert discovered resources took 0.01s
+2026-07-22 14:23:13,211 - pipeline - DEBUG - [us-east-1] execute_discovery took 4.55s
+2026-07-22 14:23:13,213 - pipeline - INFO - [us-east-1] Starting metric fetching for 0 resources...
+2026-07-22 14:23:13,213 - pipeline - INFO - [us-east-1] Discovered 0 resources. Starting LLM generation...
+2026-07-22 14:23:13,218 - pipeline - DEBUG - [us-east-1] DB insert discovered resources took 0.01s
+2026-07-22 14:23:13,228 - pipeline - INFO - [us-east-1] Starting metric fetching for 0 resources...
+2026-07-22 14:23:13,228 - pipeline - INFO - [us-east-1] Discovered 0 resources. Starting LLM generation...
+2026-07-22 14:23:13,239 - pipeline - INFO - [us-east-1] Garbage collection removed 0 stale/ghost records.
+2026-07-22 14:23:13,240 - pipeline - INFO - [us-east-1] Finished process_region in 4.57s
+2026-07-22 14:23:13,240 - pipeline - INFO - [us-east-1] Thread finished. Total time since submit: 4.58s
+2026-07-22 14:23:13,243 - pipeline - INFO - [us-east-1] Garbage collection removed 0 stale/ghost records.
+2026-07-22 14:23:13,244 - pipeline - INFO - [us-east-1] Finished process_region in 4.58s
+2026-07-22 14:23:13,244 - pipeline - INFO - [us-east-1] Thread finished. Total time since submit: 4.58s
+2026-07-22 14:23:13,989 - pipeline - DEBUG - [us-east-2] execute_discovery took 5.32s
+2026-07-22 14:23:14,006 - pipeline - DEBUG - [us-east-2] DB insert discovered resources took 0.02s
+2026-07-22 14:23:14,018 - pipeline - DEBUG - [us-east-2] execute_discovery took 5.35s
+2026-07-22 14:23:14,019 - pipeline - INFO - [us-east-2] Starting metric fetching for 42 resources...
+2026-07-22 14:23:14,043 - pipeline - DEBUG - [us-east-2] DB insert discovered resources took 0.02s
+2026-07-22 14:23:14,085 - pipeline - INFO - [us-east-2] Starting metric fetching for 42 resources...
+2026-07-22 14:23:19,594 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for compute-optimizer-alerts took 5.51s
+2026-07-22 14:23:19,617 - pipeline - DEBUG - [us-east-2] save_metric_points for compute-optimizer-alerts took 0.02s
+2026-07-22 14:23:19,638 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for compute-optimizer-alerts took 5.62s
+2026-07-22 14:23:19,683 - pipeline - DEBUG - [us-east-2] save_metric_points for compute-optimizer-alerts took 0.04s
+2026-07-22 14:23:25,221 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for stop-ec2-instance-capstone took 5.54s
+2026-07-22 14:23:25,223 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for stop-ec2-instance-capstone took 5.61s
+2026-07-22 14:23:30,798 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for start-ec2-instance-capstone took 5.57s
+2026-07-22 14:23:30,798 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for start-ec2-instance-capstone took 5.57s
+2026-07-22 14:23:36,450 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for AUTO-EC2-START took 5.65s
+2026-07-22 14:23:36,452 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for AUTO-EC2-START took 5.65s
+2026-07-22 14:23:36,470 - pipeline - DEBUG - [us-east-2] save_metric_points for AUTO-EC2-START took 0.02s
+2026-07-22 14:23:36,496 - pipeline - DEBUG - [us-east-2] save_metric_points for AUTO-EC2-START took 0.04s
+2026-07-22 14:23:42,906 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for Onboarding took 6.41s
+2026-07-22 14:23:42,964 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for Onboarding took 6.49s
+2026-07-22 14:23:48,550 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for cwsyn-qa-statuspage-7e44027a-84ab-4f7c-9ec2-e153da1d5d14 took 5.59s
+2026-07-22 14:23:48,571 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for cwsyn-qa-statuspage-7e44027a-84ab-4f7c-9ec2-e153da1d5d14 took 5.66s
+2026-07-22 14:23:54,030 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for SRE_CloudTrialEventCreate_Notifier took 5.48s
+2026-07-22 14:23:54,099 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for SRE_CloudTrialEventCreate_Notifier took 5.53s
+2026-07-22 14:23:59,436 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for healthchk-an took 5.41s
+2026-07-22 14:23:59,461 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for healthchk-an took 5.36s
+2026-07-22 14:24:05,141 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for send_email took 5.68s
+2026-07-22 14:24:05,147 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for send_email took 5.71s
+2026-07-22 14:24:10,683 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for Alertnow-POC-SRE took 5.54s
+2026-07-22 14:24:10,686 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for Alertnow-POC-SRE took 5.55s
+2026-07-22 14:24:16,145 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for SRE_CloudTrialEventCreate_Delete_Notifier took 5.46s
+2026-07-22 14:24:16,168 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for SRE_CloudTrialEventCreate_Delete_Notifier took 5.48s
+2026-07-22 14:24:21,941 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for ChronivaCalendarAccessToken_cron took 5.77s
+2026-07-22 14:24:22,034 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for ChronivaCalendarAccessToken_cron took 5.89s
+2026-07-22 14:24:22,156 - pipeline - DEBUG - [us-east-2] save_metric_points for ChronivaCalendarAccessToken_cron took 0.22s
+2026-07-22 14:24:22,329 - pipeline - DEBUG - [us-east-2] save_metric_points for ChronivaCalendarAccessToken_cron took 0.30s
+2026-07-22 14:24:27,864 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for QA-CD-Webiste-Stop took 5.71s
+2026-07-22 14:24:27,882 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for QA-CD-Webiste-Stop took 5.55s
+2026-07-22 14:24:27,907 - pipeline - DEBUG - [us-east-2] save_metric_points for QA-CD-Webiste-Stop took 0.04s
+2026-07-22 14:24:27,938 - pipeline - DEBUG - [us-east-2] save_metric_points for QA-CD-Webiste-Stop took 0.05s
+2026-07-22 14:24:33,622 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for AUTO-EC2-STOP took 5.71s
+2026-07-22 14:24:33,635 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for AUTO-EC2-STOP took 5.70s
+2026-07-22 14:24:33,644 - pipeline - DEBUG - [us-east-2] save_metric_points for AUTO-EC2-STOP took 0.02s
+2026-07-22 14:24:33,707 - pipeline - DEBUG - [us-east-2] save_metric_points for AUTO-EC2-STOP took 0.07s
+2026-07-22 14:24:39,983 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for AlertingFrameworkSetup-AlertingLambda-tWzEYtrKW0pc took 6.28s
+2026-07-22 14:24:40,034 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for AlertingFrameworkSetup-AlertingLambda-tWzEYtrKW0pc took 6.39s
+2026-07-22 14:24:40,140 - pipeline - DEBUG - [us-east-2] save_metric_points for AlertingFrameworkSetup-AlertingLambda-tWzEYtrKW0pc took 0.16s
+2026-07-22 14:24:40,335 - pipeline - DEBUG - [us-east-2] save_metric_points for AlertingFrameworkSetup-AlertingLambda-tWzEYtrKW0pc took 0.30s
+2026-07-22 14:24:46,060 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for cwsyn-qa-statuspage-459724ba-5c38-4fbb-8443-a3a9b1eeb516 took 5.92s
+2026-07-22 14:24:46,288 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for cwsyn-qa-statuspage-459724ba-5c38-4fbb-8443-a3a9b1eeb516 took 5.95s
+2026-07-22 14:24:52,652 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for RSA_Archer_Lamdafn took 6.59s
+2026-07-22 14:24:52,921 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for RSA_Archer_Lamdafn took 6.63s
+2026-07-22 14:24:58,605 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for caregiver took 5.95s
+2026-07-22 14:24:59,003 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for caregiver took 6.08s
+2026-07-22 14:25:06,235 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for IB_Linux_3_10 took 7.23s
+2026-07-22 14:25:06,237 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for IB_Linux_3_10 took 7.63s
+2026-07-22 14:25:11,745 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for SRE_AWS_CloudwatchAlarms took 5.51s
+2026-07-22 14:25:11,751 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for SRE_AWS_CloudwatchAlarms took 5.51s
+2026-07-22 14:25:18,128 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for QA-CD-Webiste-Start took 6.38s
+2026-07-22 14:25:18,145 - pipeline - DEBUG - [us-east-2] save_metric_points for QA-CD-Webiste-Start took 0.02s
+2026-07-22 14:25:18,165 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for QA-CD-Webiste-Start took 6.41s
+2026-07-22 14:25:18,205 - pipeline - DEBUG - [us-east-2] save_metric_points for QA-CD-Webiste-Start took 0.04s
+2026-07-22 14:25:25,328 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for cwsyn-qa-statuspage-7b66c9e8-34fe-4f47-80cf-8cce0389c7b4 took 7.18s
+2026-07-22 14:25:25,335 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for cwsyn-qa-statuspage-7b66c9e8-34fe-4f47-80cf-8cce0389c7b4 took 7.13s
+2026-07-22 14:25:31,169 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for Scan-My-Cloud-CUR-Data took 5.83s
+2026-07-22 14:25:31,173 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for Scan-My-Cloud-CUR-Data took 5.84s
+2026-07-22 14:25:36,918 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for EC2-AUTO-STOP took 5.75s
+2026-07-22 14:25:36,922 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for EC2-AUTO-STOP took 5.75s
+2026-07-22 14:25:36,937 - pipeline - DEBUG - [us-east-2] save_metric_points for EC2-AUTO-STOP took 0.02s
+2026-07-22 14:25:36,959 - pipeline - DEBUG - [us-east-2] save_metric_points for EC2-AUTO-STOP took 0.04s
+2026-07-22 14:25:42,504 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for log-group-cleanup-checker took 5.57s
+2026-07-22 14:25:42,507 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for log-group-cleanup-checker took 5.55s
+2026-07-22 14:25:47,401 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for SRE_UnusedIAM took 4.90s
+2026-07-22 14:25:47,423 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for SRE_UnusedIAM took 4.92s
+2026-07-22 14:25:53,325 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for baseline-overrides-8941-818am took 5.90s
+2026-07-22 14:25:53,423 - pipeline - DEBUG - [us-east-2] save_metric_points for baseline-overrides-8941-818am took 0.10s
+2026-07-22 14:25:53,561 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for baseline-overrides-8941-818am took 6.16s
+2026-07-22 14:25:53,647 - pipeline - DEBUG - [us-east-2] save_metric_points for baseline-overrides-8941-818am took 0.09s
+2026-07-22 14:25:58,698 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for serverlessrepo-cloudwatch-cloudwatchlogsprocessdat-1U5J1MA13132U took 5.28s
+2026-07-22 14:25:58,749 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for serverlessrepo-cloudwatch-cloudwatchlogsprocessdat-1U5J1MA13132U took 5.10s
+2026-07-22 14:26:04,213 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for compute_optimizer took 5.46s
+2026-07-22 14:26:04,235 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for compute_optimizer took 5.54s
+2026-07-22 14:26:09,612 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for EBS-Volume-Report took 5.38s
+2026-07-22 14:26:09,619 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for EBS-Volume-Report took 5.41s
+2026-07-22 14:26:15,145 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for delete-name-tags-us-east-2-8941-818am took 5.53s
+2026-07-22 14:26:15,167 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for delete-name-tags-us-east-2-8941-818am took 5.55s
+2026-07-22 14:26:21,068 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for S3_Lifecycle_audit took 5.92s
+2026-07-22 14:26:21,092 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for S3_Lifecycle_audit took 5.93s
+2026-07-22 14:26:26,644 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for cwsyn-qa-statuspage-3b7c2d0c-efa8-4abb-8a8b-a9d1933f8257 took 5.58s
+2026-07-22 14:26:26,647 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for cwsyn-qa-statuspage-3b7c2d0c-efa8-4abb-8a8b-a9d1933f8257 took 5.55s
+2026-07-22 14:26:32,308 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for cwsyn-qa-statuspage-a00d08b3-4afb-4f30-b3f9-f39eae96c3ca took 5.66s
+2026-07-22 14:26:32,372 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for cwsyn-qa-statuspage-a00d08b3-4afb-4f30-b3f9-f39eae96c3ca took 5.73s
+2026-07-22 14:26:39,137 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for cloudwatch-to-slack took 6.83s
+2026-07-22 14:26:39,169 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for cloudwatch-to-slack took 6.80s
+2026-07-22 14:26:44,796 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for conclaveai-imagedetection took 5.66s
+2026-07-22 14:26:44,850 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for conclaveai-imagedetection took 5.68s
+2026-07-22 14:26:50,105 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for cwsyn-qa-statuspage-3ca49fd4-cce5-4608-96ab-d421b921f2b6 took 5.25s
+2026-07-22 14:26:50,106 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for cwsyn-qa-statuspage-3ca49fd4-cce5-4608-96ab-d421b921f2b6 took 5.31s
+2026-07-22 14:26:55,762 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for s3_storage_lens_parser took 5.66s
+2026-07-22 14:26:55,767 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for s3_storage_lens_parser took 5.66s
+2026-07-22 14:26:55,783 - pipeline - DEBUG - [us-east-2] save_metric_points for s3_storage_lens_parser took 0.02s
+2026-07-22 14:26:55,817 - pipeline - DEBUG - [us-east-2] save_metric_points for s3_storage_lens_parser took 0.05s
+2026-07-22 14:27:03,212 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for SecurityHubToTeams took 7.43s
+2026-07-22 14:27:03,368 - pipeline - DEBUG - [us-east-2] save_metric_points for SecurityHubToTeams took 0.16s
+2026-07-22 14:27:03,431 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for SecurityHubToTeams took 7.47s
+2026-07-22 14:27:03,554 - pipeline - DEBUG - [us-east-2] save_metric_points for SecurityHubToTeams took 0.12s
+2026-07-22 14:27:09,311 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for RSA_Lamda_Start took 5.93s
+2026-07-22 14:27:09,336 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for RSA_Lamda_Start took 5.78s
+2026-07-22 14:27:14,748 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for EC2-AUTO-START took 5.44s
+2026-07-22 14:27:14,760 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for EC2-AUTO-START took 5.42s
+2026-07-22 14:27:14,770 - pipeline - DEBUG - [us-east-2] save_metric_points for EC2-AUTO-START took 0.02s
+2026-07-22 14:27:14,800 - pipeline - DEBUG - [us-east-2] save_metric_points for EC2-AUTO-START took 0.04s
+2026-07-22 14:27:20,625 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for cwsyn-qa-statuspage-d3bf3bcc-1939-4151-8d44-8e2b906b6b63 took 5.83s
+2026-07-22 14:27:20,625 - pipeline - INFO - [us-east-2] Discovered 42 resources. Starting LLM generation...
+2026-07-22 14:27:20,637 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for cwsyn-qa-statuspage-d3bf3bcc-1939-4151-8d44-8e2b906b6b63 took 5.87s
+2026-07-22 14:27:20,638 - pipeline - INFO - [us-east-2] Discovered 42 resources. Starting LLM generation...
+2026-07-22 14:27:20,811 - pipeline - INFO - [us-east-2] Batch of 5 finished in 0.19s
+2026-07-22 14:27:21,095 - pipeline - INFO - [us-east-2] Batch of 5 finished in 0.47s
+2026-07-22 14:27:21,296 - pipeline - INFO - [us-east-2] Batch of 5 finished in 0.67s
+2026-07-22 14:27:21,494 - pipeline - INFO - [us-east-2] Batch of 5 finished in 0.85s
+2026-07-22 14:27:21,667 - pipeline - INFO - [us-east-2] Batch of 5 finished in 1.02s
+2026-07-22 14:27:21,775 - pipeline - INFO - [us-east-2] Batch of 5 finished in 1.13s
+2026-07-22 14:27:31,968 - pipeline - DEBUG - [us-east-2] LLM batch (size 1) took 10.66s
+2026-07-22 14:27:31,979 - pipeline - DEBUG - [us-east-2] LLM batch (size 1) took 10.16s
+2026-07-22 14:27:31,985 - pipeline - INFO - [us-east-2] Batch of 2 finished in 11.34s
+2026-07-22 14:27:32,003 - pipeline - INFO - [us-east-2] Batch of 5 finished in 11.36s
+2026-07-22 14:27:32,380 - pipeline - DEBUG - [us-east-2] LLM batch (size 2) took 10.42s
+2026-07-22 14:27:32,392 - pipeline - INFO - [us-east-2] Batch of 5 finished in 11.75s
+2026-07-22 14:27:32,731 - pipeline - DEBUG - [us-east-2] LLM batch (size 2) took 10.83s
+2026-07-22 14:27:32,737 - pipeline - DEBUG - [us-east-2] LLM batch (size 2) took 8.90s
+2026-07-22 14:27:32,747 - pipeline - INFO - [us-east-2] Batch of 5 finished in 12.12s
+2026-07-22 14:27:32,757 - pipeline - INFO - [us-east-2] Batch of 5 finished in 12.11s
+2026-07-22 14:27:33,032 - pipeline - DEBUG - [us-east-2] LLM batch (size 2) took 11.08s
+2026-07-22 14:27:33,046 - pipeline - INFO - [us-east-2] Batch of 5 finished in 12.40s
+2026-07-22 14:27:33,332 - pipeline - DEBUG - [us-east-2] LLM batch (size 2) took 11.45s
+2026-07-22 14:27:33,350 - pipeline - INFO - [us-east-2] Batch of 5 finished in 12.72s
+2026-07-22 14:27:33,623 - pipeline - DEBUG - [us-east-2] LLM batch (size 4) took 9.88s
+2026-07-22 14:27:33,638 - pipeline - INFO - [us-east-2] Batch of 5 finished in 13.01s
+2026-07-22 14:27:33,652 - pipeline - DEBUG - [us-east-2] LLM batch (size 4) took 9.78s
+2026-07-22 14:27:33,666 - pipeline - INFO - [us-east-2] Batch of 5 finished in 13.02s
+2026-07-22 14:27:33,672 - pipeline - INFO - [us-east-2] Garbage collection removed 0 stale/ghost records.
+2026-07-22 14:27:33,673 - pipeline - INFO - [us-east-2] Finished process_region in 265.00s
+2026-07-22 14:27:33,674 - pipeline - INFO - [us-east-2] Thread finished. Total time since submit: 265.01s
+2026-07-22 14:27:34,117 - pipeline - DEBUG - [us-east-2] LLM batch (size 1) took 13.01s
+2026-07-22 14:27:34,130 - pipeline - INFO - [us-east-2] Batch of 2 finished in 13.50s
+2026-07-22 14:27:34,615 - pipeline - DEBUG - [us-east-2] LLM batch (size 1) took 12.81s
+2026-07-22 14:27:34,628 - pipeline - INFO - [us-east-2] Batch of 5 finished in 14.00s
+2026-07-22 14:27:36,316 - pipeline - DEBUG - [us-east-2] LLM batch (size 2) took 12.52s
+2026-07-22 14:27:36,330 - pipeline - INFO - [us-east-2] Batch of 5 finished in 15.70s
+2026-07-22 14:27:36,337 - pipeline - INFO - [us-east-2] Garbage collection removed 0 stale/ghost records.
+2026-07-22 14:27:36,337 - pipeline - INFO - [us-east-2] Finished process_region in 267.67s
+2026-07-22 14:27:36,338 - pipeline - INFO - [us-east-2] Thread finished. Total time since submit: 267.67s
+2026-07-22 14:27:36,350 - pipeline - INFO - Finished execution_generator in 267.69s
+2026-07-22 14:55:25,843 - pipeline - INFO - Started execution_generator (execution_id=17)
+2026-07-22 14:55:25,844 - pipeline - INFO - [us-east-1] Started process_region
+2026-07-22 14:55:25,845 - pipeline - INFO - [us-east-2] Started process_region
+2026-07-22 14:55:25,846 - pipeline - INFO - [us-east-1] Started process_region
+2026-07-22 14:55:25,849 - pipeline - INFO - [us-east-2] Started process_region
+2026-07-22 14:55:30,454 - pipeline - DEBUG - [us-east-1] execute_discovery took 4.61s
+2026-07-22 14:55:30,456 - pipeline - DEBUG - [us-east-1] execute_discovery took 4.61s
+2026-07-22 14:55:30,460 - pipeline - DEBUG - [us-east-1] DB insert discovered resources took 0.00s
+2026-07-22 14:55:30,462 - pipeline - DEBUG - [us-east-1] DB insert discovered resources took 0.01s
+2026-07-22 14:55:30,466 - pipeline - INFO - [us-east-1] Starting metric fetching for 0 resources...
+2026-07-22 14:55:30,466 - pipeline - INFO - [us-east-1] Discovered 0 resources. Starting LLM generation...
+2026-07-22 14:55:30,468 - pipeline - INFO - [us-east-1] Starting metric fetching for 0 resources...
+2026-07-22 14:55:30,468 - pipeline - INFO - [us-east-1] Discovered 0 resources. Starting LLM generation...
+2026-07-22 14:55:30,471 - pipeline - INFO - [us-east-1] Garbage collection removed 0 stale/ghost records.
+2026-07-22 14:55:30,472 - pipeline - INFO - [us-east-1] Finished process_region in 4.63s
+2026-07-22 14:55:30,472 - pipeline - INFO - [us-east-1] Thread finished. Total time since submit: 4.63s
+2026-07-22 14:55:30,473 - pipeline - INFO - [us-east-1] Garbage collection removed 0 stale/ghost records.
+2026-07-22 14:55:30,473 - pipeline - INFO - [us-east-1] Finished process_region in 4.63s
+2026-07-22 14:55:30,474 - pipeline - INFO - [us-east-1] Thread finished. Total time since submit: 4.63s
+2026-07-22 14:55:31,224 - pipeline - DEBUG - [us-east-2] execute_discovery took 5.38s
+2026-07-22 14:55:31,238 - pipeline - DEBUG - [us-east-2] DB insert discovered resources took 0.01s
+2026-07-22 14:55:31,244 - pipeline - INFO - [us-east-2] Starting metric fetching for 42 resources...
+2026-07-22 14:55:31,322 - pipeline - DEBUG - [us-east-2] execute_discovery took 5.47s
+2026-07-22 14:55:31,337 - pipeline - DEBUG - [us-east-2] DB insert discovered resources took 0.01s
+2026-07-22 14:55:31,345 - pipeline - INFO - [us-east-2] Starting metric fetching for 42 resources...
+2026-07-22 14:55:33,986 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for compute-optimizer-alerts took 2.64s
+2026-07-22 14:55:34,028 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for compute-optimizer-alerts took 2.78s
+2026-07-22 14:55:36,708 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for stop-ec2-instance-capstone took 2.72s
+2026-07-22 14:55:36,736 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for stop-ec2-instance-capstone took 2.71s
+2026-07-22 14:55:39,578 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for start-ec2-instance-capstone took 2.87s
+2026-07-22 14:55:39,582 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for start-ec2-instance-capstone took 2.85s
+2026-07-22 14:55:42,294 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for AUTO-EC2-START took 2.72s
+2026-07-22 14:55:42,297 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for AUTO-EC2-START took 2.71s
+2026-07-22 14:55:45,219 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for Onboarding took 2.92s
+2026-07-22 14:55:45,222 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for Onboarding took 2.92s
+2026-07-22 14:55:47,808 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for cwsyn-qa-statuspage-7e44027a-84ab-4f7c-9ec2-e153da1d5d14 took 2.59s
+2026-07-22 14:55:47,811 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for cwsyn-qa-statuspage-7e44027a-84ab-4f7c-9ec2-e153da1d5d14 took 2.59s
+2026-07-22 14:55:50,595 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for SRE_CloudTrialEventCreate_Notifier took 2.79s
+2026-07-22 14:55:50,606 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for SRE_CloudTrialEventCreate_Notifier took 2.80s
+2026-07-22 14:55:53,347 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for healthchk-an took 2.74s
+2026-07-22 14:55:53,351 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for healthchk-an took 2.76s
+2026-07-22 14:55:56,476 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for send_email took 3.13s
+2026-07-22 14:55:56,500 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for send_email took 3.15s
+2026-07-22 14:55:59,105 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for Alertnow-POC-SRE took 2.63s
+2026-07-22 14:55:59,131 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for Alertnow-POC-SRE took 2.63s
+2026-07-22 14:56:01,787 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for SRE_CloudTrialEventCreate_Delete_Notifier took 2.66s
+2026-07-22 14:56:01,799 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for SRE_CloudTrialEventCreate_Delete_Notifier took 2.69s
+2026-07-22 14:56:05,819 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for ChronivaCalendarAccessToken_cron took 4.02s
+2026-07-22 14:56:05,956 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for ChronivaCalendarAccessToken_cron took 4.17s
+2026-07-22 14:56:08,634 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for QA-CD-Webiste-Stop took 2.68s
+2026-07-22 14:56:08,714 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for QA-CD-Webiste-Stop took 2.88s
+2026-07-22 14:56:11,529 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for AUTO-EC2-STOP took 2.89s
+2026-07-22 14:56:11,546 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for AUTO-EC2-STOP took 2.83s
+2026-07-22 14:56:15,133 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for AlertingFrameworkSetup-AlertingLambda-tWzEYtrKW0pc took 3.60s
+2026-07-22 14:56:15,137 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for AlertingFrameworkSetup-AlertingLambda-tWzEYtrKW0pc took 3.59s
+2026-07-22 14:56:17,946 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for cwsyn-qa-statuspage-459724ba-5c38-4fbb-8443-a3a9b1eeb516 took 2.81s
+2026-07-22 14:56:17,949 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for cwsyn-qa-statuspage-459724ba-5c38-4fbb-8443-a3a9b1eeb516 took 2.81s
+2026-07-22 14:56:20,793 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for RSA_Archer_Lamdafn took 2.85s
+2026-07-22 14:56:20,873 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for RSA_Archer_Lamdafn took 2.92s
+2026-07-22 14:56:23,571 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for caregiver took 2.78s
+2026-07-22 14:56:23,602 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for caregiver took 2.73s
+2026-07-22 14:56:26,311 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for IB_Linux_3_10 took 2.74s
+2026-07-22 14:56:26,344 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for IB_Linux_3_10 took 2.74s
+2026-07-22 14:56:29,265 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for SRE_AWS_CloudwatchAlarms took 2.95s
+2026-07-22 14:56:29,274 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for SRE_AWS_CloudwatchAlarms took 2.93s
+2026-07-22 14:56:31,974 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for QA-CD-Webiste-Start took 2.71s
+2026-07-22 14:56:32,015 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for QA-CD-Webiste-Start took 2.74s
+2026-07-22 14:56:34,856 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for cwsyn-qa-statuspage-7b66c9e8-34fe-4f47-80cf-8cce0389c7b4 took 2.88s
+2026-07-22 14:56:34,938 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for cwsyn-qa-statuspage-7b66c9e8-34fe-4f47-80cf-8cce0389c7b4 took 2.92s
+2026-07-22 14:56:37,590 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for Scan-My-Cloud-CUR-Data took 2.73s
+2026-07-22 14:56:37,643 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for Scan-My-Cloud-CUR-Data took 2.70s
+2026-07-22 14:56:40,644 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for EC2-AUTO-STOP took 3.05s
+2026-07-22 14:56:40,646 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for EC2-AUTO-STOP took 3.00s
+2026-07-22 14:56:43,440 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for log-group-cleanup-checker took 2.80s
+2026-07-22 14:56:43,447 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for log-group-cleanup-checker took 2.80s
+2026-07-22 14:56:46,471 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for SRE_UnusedIAM took 3.02s
+2026-07-22 14:56:50,746 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for SRE_UnusedIAM took 7.31s
+2026-07-22 14:56:50,865 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for baseline-overrides-8941-818am took 4.39s
+2026-07-22 14:56:53,981 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for serverlessrepo-cloudwatch-cloudwatchlogsprocessdat-1U5J1MA13132U took 3.12s
+2026-07-22 14:56:55,666 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for baseline-overrides-8941-818am took 4.92s
+2026-07-22 14:56:56,787 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for compute_optimizer took 2.81s
+2026-07-22 14:57:00,045 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for EBS-Volume-Report took 3.26s
+2026-07-22 14:57:00,568 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for serverlessrepo-cloudwatch-cloudwatchlogsprocessdat-1U5J1MA13132U took 4.90s
+2026-07-22 14:57:02,323 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for delete-name-tags-us-east-2-8941-818am took 2.28s
+2026-07-22 14:57:02,968 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for compute_optimizer took 2.40s
+2026-07-22 14:57:04,989 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for S3_Lifecycle_audit took 2.67s
+2026-07-22 14:57:06,073 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for EBS-Volume-Report took 3.10s
+2026-07-22 14:57:08,069 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for cwsyn-qa-statuspage-3b7c2d0c-efa8-4abb-8a8b-a9d1933f8257 took 3.08s
+2026-07-22 14:57:10,286 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for delete-name-tags-us-east-2-8941-818am took 4.21s
+2026-07-22 14:57:10,758 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for cwsyn-qa-statuspage-a00d08b3-4afb-4f30-b3f9-f39eae96c3ca took 2.69s
+2026-07-22 14:57:13,221 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for S3_Lifecycle_audit took 2.94s
+2026-07-22 14:57:13,451 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for cloudwatch-to-slack took 2.69s
+2026-07-22 14:57:16,492 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for cwsyn-qa-statuspage-3b7c2d0c-efa8-4abb-8a8b-a9d1933f8257 took 3.27s
+2026-07-22 14:57:16,610 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for conclaveai-imagedetection took 3.16s
+2026-07-22 14:57:19,463 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for cwsyn-qa-statuspage-a00d08b3-4afb-4f30-b3f9-f39eae96c3ca took 2.97s
+2026-07-22 14:57:19,670 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for cwsyn-qa-statuspage-3ca49fd4-cce5-4608-96ab-d421b921f2b6 took 3.06s
+2026-07-22 14:57:22,955 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for s3_storage_lens_parser took 3.28s
+2026-07-22 14:57:23,759 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for cloudwatch-to-slack took 4.30s
+2026-07-22 14:57:26,899 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for conclaveai-imagedetection took 3.14s
+2026-07-22 14:57:27,374 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for SecurityHubToTeams took 4.42s
+2026-07-22 14:57:31,020 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for cwsyn-qa-statuspage-3ca49fd4-cce5-4608-96ab-d421b921f2b6 took 4.12s
+2026-07-22 14:57:31,034 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for RSA_Lamda_Start took 3.66s
+2026-07-22 14:57:35,329 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for EC2-AUTO-START took 4.29s
+2026-07-22 14:57:35,497 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for s3_storage_lens_parser took 4.48s
+2026-07-22 14:57:39,698 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for cwsyn-qa-statuspage-d3bf3bcc-1939-4151-8d44-8e2b906b6b63 took 4.37s
+2026-07-22 14:57:39,698 - pipeline - INFO - [us-east-2] Discovered 42 resources. Starting LLM generation...
+2026-07-22 14:57:40,026 - pipeline - INFO - [us-east-2] Batch of 5 finished in 0.32s
+2026-07-22 14:57:40,270 - pipeline - INFO - [us-east-2] Batch of 5 finished in 0.57s
+2026-07-22 14:57:40,368 - pipeline - INFO - [us-east-2] Batch of 5 finished in 0.67s
+2026-07-22 14:57:41,412 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for SecurityHubToTeams took 5.91s
+2026-07-22 14:57:51,466 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for RSA_Lamda_Start took 10.05s
+2026-07-22 14:57:53,019 - pipeline - DEBUG - [us-east-2] LLM batch (size 1) took 12.60s
+2026-07-22 14:57:53,032 - pipeline - INFO - [us-east-2] Batch of 2 finished in 13.32s
+2026-07-22 14:57:53,839 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for EC2-AUTO-START took 2.37s
+2026-07-22 14:57:54,095 - pipeline - DEBUG - [us-east-2] LLM batch (size 2) took 13.15s
+2026-07-22 14:57:54,114 - pipeline - INFO - [us-east-2] Batch of 5 finished in 14.42s
+2026-07-22 14:57:54,481 - pipeline - DEBUG - [us-east-2] LLM batch (size 1) took 10.19s
+2026-07-22 14:57:54,502 - pipeline - INFO - [us-east-2] Batch of 5 finished in 14.80s
+2026-07-22 14:57:54,838 - pipeline - DEBUG - [us-east-2] LLM batch (size 2) took 10.78s
+2026-07-22 14:57:54,862 - pipeline - INFO - [us-east-2] Batch of 5 finished in 15.15s
+2026-07-22 14:57:56,253 - pipeline - DEBUG - [us-east-2] LLM batch (size 2) took 14.67s
+2026-07-22 14:57:56,267 - pipeline - INFO - [us-east-2] Batch of 5 finished in 16.56s
+2026-07-22 14:57:56,524 - pipeline - DEBUG - [us-east-2] execute_metric_fetching for cwsyn-qa-statuspage-d3bf3bcc-1939-4151-8d44-8e2b906b6b63 took 2.68s
+2026-07-22 14:57:56,524 - pipeline - INFO - [us-east-2] Discovered 42 resources. Starting LLM generation...
+2026-07-22 14:57:56,614 - pipeline - INFO - [us-east-2] Batch of 5 finished in 0.09s
+2026-07-22 14:57:56,752 - pipeline - INFO - [us-east-2] Batch of 5 finished in 0.22s
+2026-07-22 14:57:56,800 - pipeline - INFO - [us-east-2] Batch of 5 finished in 0.27s
+2026-07-22 14:57:58,144 - pipeline - DEBUG - [us-east-2] LLM batch (size 4) took 13.23s
+2026-07-22 14:57:58,165 - pipeline - INFO - [us-east-2] Batch of 5 finished in 18.46s
+2026-07-22 14:57:58,177 - pipeline - INFO - [us-east-2] Garbage collection removed 0 stale/ghost records.
+2026-07-22 14:57:58,178 - pipeline - INFO - [us-east-2] Finished process_region in 152.33s
+2026-07-22 14:57:58,179 - pipeline - INFO - [us-east-2] Thread finished. Total time since submit: 152.34s
+2026-07-22 14:58:01,738 - pipeline - DEBUG - [us-east-2] LLM batch (size 1) took 4.93s
+2026-07-22 14:58:01,754 - pipeline - INFO - [us-east-2] Batch of 2 finished in 5.22s
+2026-07-22 14:58:02,641 - pipeline - DEBUG - [us-east-2] LLM batch (size 1) took 5.01s
+2026-07-22 14:58:02,657 - pipeline - INFO - [us-east-2] Batch of 5 finished in 6.13s
+2026-07-22 14:58:03,487 - pipeline - DEBUG - [us-east-2] LLM batch (size 2) took 6.55s
+2026-07-22 14:58:03,503 - pipeline - INFO - [us-east-2] Batch of 5 finished in 6.98s
+2026-07-22 14:58:03,532 - pipeline - DEBUG - [us-east-2] LLM batch (size 2) took 5.70s
+2026-07-22 14:58:03,550 - pipeline - INFO - [us-east-2] Batch of 5 finished in 7.02s
+2026-07-22 14:58:03,855 - pipeline - DEBUG - [us-east-2] LLM batch (size 2) took 6.93s
+2026-07-22 14:58:03,872 - pipeline - INFO - [us-east-2] Batch of 5 finished in 7.35s
+2026-07-22 14:58:05,474 - pipeline - DEBUG - [us-east-2] LLM batch (size 4) took 7.47s
+2026-07-22 14:58:05,488 - pipeline - INFO - [us-east-2] Batch of 5 finished in 8.96s
+2026-07-22 14:58:05,497 - pipeline - INFO - [us-east-2] Garbage collection removed 0 stale/ghost records.
+2026-07-22 14:58:05,497 - pipeline - INFO - [us-east-2] Finished process_region in 159.65s
+2026-07-22 14:58:05,497 - pipeline - INFO - [us-east-2] Thread finished. Total time since submit: 159.65s
+2026-07-22 14:58:05,513 - pipeline - INFO - Finished execution_generator in 159.67s

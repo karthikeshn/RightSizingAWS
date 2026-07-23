@@ -51,15 +51,15 @@ function App() {
           <TopHeader activeConfigId={activeConfigId} setActiveConfigId={setActiveConfigId} setActiveTab={setActiveTab} />
           
           {isDashboardArea && (
-            <div className="px-6 pt-6 pb-2 flex gap-8 border-b border-zinc-800/30">
+            <div className="px-6 pt-6 flex gap-8 border-b border-zinc-800/30">
               {topNavItems.map(item => (
                 <button
                   key={item.id}
                   onClick={() => setActiveTab(item.id)}
-                  className={`text-sm transition-colors tracking-wide ${
+                  className={`text-sm transition-colors tracking-wide pb-3 -mb-[1px] border-b-2 ${
                     activeTab === item.id 
-                      ? 'text-white font-bold' 
-                      : 'text-zinc-500 font-medium hover:text-zinc-300'
+                      ? 'text-white font-bold border-white' 
+                      : 'text-zinc-500 font-medium border-transparent hover:text-zinc-300 hover:border-zinc-700'
                   }`}
                 >
                   {item.label}
@@ -68,8 +68,8 @@ function App() {
             </div>
           )}
 
-          <main className="flex-1 overflow-y-auto p-6 scrollbar-thin">
-            <div className="max-w-7xl mx-auto h-full">
+          <main id="main-scroll-container" className="flex-1 overflow-y-auto p-6 scrollbar-thin">
+            <div key={activeTab} className="max-w-7xl mx-auto h-full animate-fade-in">
               {renderActiveTab()}
             </div>
           </main>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { fetchBillingServices } from '../services/api';
+import { fetchBillingServices, fetchRegistry } from '../services/api';
 import { Layers, Server, Globe } from 'lucide-react';
 
 const ServicesDiscovery = ({ activeConfigId }) => {
@@ -21,16 +21,26 @@ const ServicesDiscovery = ({ activeConfigId }) => {
         setLoading(true);
         setError(null);
         try {
-            const data = await fetchBillingServices(activeConfigId);
-            setLastScanned(data.last_scanned);
-            const active = data.active_services || [];
+            const [billingData, registryData] = await Promise.all([
+                fetchBillingServices(activeConfigId),
+                fetchRegistry()
+            ]);
+            
+            setLastScanned(billingData.last_scanned);
+            const active = billingData.active_services || [];
+            
+            const allowedServiceNames = new Set(
+                registryData
+                    .filter(r => r.supports_right_sizing)
+                    .map(r => r.service_name)
+            );
             
             const serviceMap = {};
             active.forEach(item => {
                 if (!serviceMap[item.service_name]) {
                     serviceMap[item.service_name] = {
                         service_name: item.service_name,
-                        status: item.status,
+                        status: allowedServiceNames.has(item.service_name) ? 'Known Service' : 'New Service',
                         regions: new Set()
                     };
                 }

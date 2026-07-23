@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { fetchRecommendations, fetchAnalyzedServices, fetchBillingServices, fetchResourceMetrics, exportAnalysisReport } from '../services/api';
-import { Search, ChevronDown, Code, X, Download } from 'lucide-react';
+import { Search, ChevronDown, Code, X, Download, ArrowUp } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { Virtuoso } from 'react-virtuoso';
+import { createPortal } from 'react-dom';
 
 const AnalysisResults = ({ activeConfigId, targetService, setTargetService }) => {
     const [loading, setLoading] = useState(false);
@@ -15,6 +17,13 @@ const AnalysisResults = ({ activeConfigId, targetService, setTargetService }) =>
     const [regionFilter, setRegionFilter] = useState('All Regions');
     const [recFilter, setRecFilter] = useState('All Recommendations');
     const [searchQuery, setSearchQuery] = useState('');
+
+    const scrollToTop = () => {
+        const mainContainer = document.getElementById('main-scroll-container');
+        if (mainContainer) {
+            mainContainer.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    };
 
     // Detail Modal State
     const [detailModalRow, setDetailModalRow] = useState(null);
@@ -211,7 +220,6 @@ const AnalysisResults = ({ activeConfigId, targetService, setTargetService }) =>
         { value: 'Unknown', label: `Unknown (${recCounts['Unknown']})` }
     ];
 
-    // Filtering logic
     const filteredRecommendations = recommendations.filter(r => {
         const matchesService = serviceFilter === 'All Services' || r.service_type === serviceFilter;
         const matchesRegion = regionFilter === 'All Regions' || r.region === regionFilter;
@@ -268,12 +276,12 @@ const AnalysisResults = ({ activeConfigId, targetService, setTargetService }) =>
                 </button>
             </div>
 
-            {/* Filter Section (Sticky) */}
-            <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-xl p-4 shrink-0 flex items-center gap-4 sticky top-0 z-10">
+            {/* Filter Section */}
+            <div className="bg-zinc-900/30 border border-zinc-800/50 rounded-xl p-4 shrink-0 flex items-center gap-4 relative z-20">
                 <div className="flex flex-col w-48">
                     <label className="text-[10px] text-zinc-500 uppercase tracking-wider mb-1 font-semibold">Service</label>
                     <select 
-                        className="bg-black border border-zinc-800 rounded-lg px-3 py-1.5 text-sm text-zinc-300 focus:outline-none focus:border-blue-500"
+                        className="bg-zinc-900/50 border border-zinc-700/50 rounded-lg px-3 py-1.5 text-sm text-zinc-300 focus:outline-none focus:border-zinc-500 hover:border-zinc-600 transition-colors cursor-pointer"
                         value={serviceFilter}
                         onChange={e => setServiceFilter(e.target.value)}
                     >
@@ -284,7 +292,7 @@ const AnalysisResults = ({ activeConfigId, targetService, setTargetService }) =>
                 <div className="flex flex-col w-48">
                     <label className="text-[10px] text-zinc-500 uppercase tracking-wider mb-1 font-semibold">Region</label>
                     <select 
-                        className="bg-black border border-zinc-800 rounded-lg px-3 py-1.5 text-sm text-zinc-300 focus:outline-none focus:border-blue-500"
+                        className="bg-zinc-900/50 border border-zinc-700/50 rounded-lg px-3 py-1.5 text-sm text-zinc-300 focus:outline-none focus:border-zinc-500 hover:border-zinc-600 transition-colors cursor-pointer"
                         value={regionFilter}
                         onChange={e => setRegionFilter(e.target.value)}
                     >
@@ -295,7 +303,7 @@ const AnalysisResults = ({ activeConfigId, targetService, setTargetService }) =>
                 <div className="flex flex-col w-48">
                     <label className="text-[10px] text-zinc-500 uppercase tracking-wider mb-1 font-semibold">Recommendation</label>
                     <select 
-                        className="bg-black border border-zinc-800 rounded-lg px-3 py-1.5 text-sm text-zinc-300 focus:outline-none focus:border-blue-500"
+                        className="bg-zinc-900/50 border border-zinc-700/50 rounded-lg px-3 py-1.5 text-sm text-zinc-300 focus:outline-none focus:border-zinc-500 hover:border-zinc-600 transition-colors cursor-pointer"
                         value={recFilter}
                         onChange={e => setRecFilter(e.target.value)}
                     >
@@ -310,7 +318,7 @@ const AnalysisResults = ({ activeConfigId, targetService, setTargetService }) =>
                         <input 
                             type="text" 
                             placeholder="Search by Resource ID or Name..." 
-                            className="w-full bg-black border border-zinc-800 rounded-lg pl-9 pr-3 py-1.5 text-sm text-zinc-300 focus:outline-none focus:border-blue-500"
+                            className="w-full bg-zinc-900/50 border border-zinc-700/50 rounded-lg pl-9 pr-3 py-1.5 text-sm text-zinc-300 focus:outline-none focus:border-zinc-500 hover:border-zinc-600 transition-colors"
                             value={searchQuery}
                             onChange={e => setSearchQuery(e.target.value)}
                         />
@@ -333,8 +341,8 @@ const AnalysisResults = ({ activeConfigId, targetService, setTargetService }) =>
                         No resources match the selected filters.
                     </div>
                 ) : (
-                    <div className="w-full text-sm">
-                        <div className="grid grid-cols-12 gap-4 px-6 py-3 border-b border-zinc-800/50 bg-zinc-900/80 sticky top-0 font-semibold text-[11px] text-zinc-500 uppercase tracking-wider z-10">
+                    <div className="w-full text-sm relative">
+                        <div className="grid grid-cols-12 gap-4 px-6 py-3 border-b border-zinc-800/50 bg-zinc-900 sticky top-0 font-semibold text-[11px] text-zinc-500 uppercase tracking-wider z-10">
                             <div className="col-span-1">Sno</div>
                             <div className="col-span-2">Resource ID</div>
                             <div className="col-span-2">Region</div>
@@ -344,40 +352,54 @@ const AnalysisResults = ({ activeConfigId, targetService, setTargetService }) =>
                             <div className="col-span-1 text-right"></div>
                         </div>
 
-                        <div className="divide-y divide-zinc-800/50 pb-4">
-                            {filteredRecommendations.map((row, i) => {
-                                const recText = row.suggested_type || row.recommendation; // Use suggested_type if present
-                                
-                                return (
-                                    <React.Fragment key={row.resource_id}>
+                        <div>
+                            <Virtuoso
+                                useWindowScroll
+                                customScrollParent={document.getElementById('main-scroll-container')}
+                                data={filteredRecommendations}
+                                itemContent={(index, row) => {
+                                    const recText = row.suggested_type || row.recommendation;
+                                    
+                                    return (
                                         <div 
-                                            className="grid grid-cols-12 gap-4 px-6 py-4 items-center cursor-pointer transition-colors hover:bg-zinc-800/30"
+                                            className="grid grid-cols-12 gap-4 px-6 py-4 items-center cursor-pointer transition-colors hover:bg-zinc-800/30 border-b border-zinc-800/50 last:border-b-0"
                                             onClick={() => setDetailModalRow(row)}
                                         >
-                                            <div className="col-span-1 font-medium text-zinc-500">{i + 1}</div>
+                                            <div className="col-span-1 font-medium text-zinc-500">{index + 1}</div>
                                             <div className="col-span-2 font-medium text-white truncate">{row.resource_id}</div>
                                             <div className="col-span-2 text-zinc-400 truncate">{row.region}</div>
                                             <div className="col-span-2 font-mono text-zinc-400 truncate">{row.summary?.current_capacity || 'N/A'}</div>
                                             <div className="col-span-2 font-mono text-zinc-300 truncate">{recText}</div>
                                             <div className="col-span-2">
                                                 <span className={`px-2 py-1 border rounded-md text-[11px] font-semibold tracking-wide ${getBadgeStyles(row.recommendation)}`}>
-                                                    {row.recommendation.split(' ')[0]} {/* Simplified status text */}
+                                                    {row.recommendation.split(' ')[0]}
                                                 </span>
                                             </div>
                                             <div className="col-span-1 text-right text-zinc-500 flex justify-end">
                                                 <ChevronDown size={18}/>
                                             </div>
                                         </div>
-                                    </React.Fragment>
-                                );
-                            })}
+                                    );
+                                }}
+                            />
+                        </div>
+                        
+                        {/* Scroll to Top Button */}
+                        <div className="sticky bottom-8 w-full flex justify-end z-50 pointer-events-none pb-2 pr-2">
+                            <button 
+                                onClick={scrollToTop}
+                                title="Scroll to Top"
+                                className="pointer-events-auto flex items-center justify-center w-10 h-10 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded-full transition-colors border border-zinc-700 hover:border-zinc-500 shadow-lg"
+                            >
+                                <ArrowUp size={20} />
+                            </button>
                         </div>
                     </div>
                 )}
             </div>
 
             {/* Detail Modal */}
-            {detailModalRow && (
+            {detailModalRow && createPortal(
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
                     <div className="bg-[#0a0a0e] border border-zinc-800 rounded-xl w-full max-w-6xl max-h-[90vh] flex flex-col shadow-2xl">
                         <div className="flex items-center justify-between p-6 border-b border-zinc-800/50 shrink-0">
@@ -508,10 +530,10 @@ const AnalysisResults = ({ activeConfigId, targetService, setTargetService }) =>
                         </div>
                     </div>
                 </div>
-            )}
+            , document.body)}
 
             {/* Debug Modal */}
-            {debugModalData.isOpen && debugModalData.row && (
+            {debugModalData.isOpen && debugModalData.row && createPortal(
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
                     <div className="bg-[#0a0a0e] border border-zinc-800 rounded-xl w-full max-w-6xl max-h-[90vh] flex flex-col shadow-2xl">
                         <div className="flex items-center justify-between p-4 border-b border-zinc-800/50">
@@ -550,7 +572,7 @@ const AnalysisResults = ({ activeConfigId, targetService, setTargetService }) =>
                         </div>
                     </div>
                 </div>
-            )}
+            , document.body)}
         </div>
     );
 };

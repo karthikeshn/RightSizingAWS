@@ -10,7 +10,7 @@ def get_registry():
     cursor.execute("SELECT * FROM services_registry")
     rows = cursor.fetchall()
     conn.close()
-    return {r['service_name']: bool(r['supports_right_sizing']) for r in rows}
+    return [dict(r) for r in rows]
 
 def update_registry_service(service_name, supports):
     """

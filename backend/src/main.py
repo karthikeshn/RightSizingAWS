@@ -192,6 +192,12 @@ def scan_active_services(data: ScanRequest):
                 now
             ))
             
+            # Auto-populate registry with default supports_right_sizing = 0
+            cursor.execute("""
+                INSERT OR IGNORE INTO services_registry (service_name, supports_right_sizing)
+                VALUES (?, 0)
+            """, (item["service_name"],))
+            
         conn.commit()
     finally:
         conn.close()

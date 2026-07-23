@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { fetchBillingServices, generateCode, reviewCode, validateCloudConfig, fetchLatestCode, fetchExecutionHistory } from '../services/api';
+import { fetchBillingServices, generateCode, reviewCode, validateCloudConfig, fetchLatestCode, fetchExecutionHistory, fetchRegistry } from '../services/api';
 import { Code, XCircle, Play, RefreshCw, Save, Loader } from 'lucide-react';
 import { PipelineContext } from '../context/PipelineContext';
+import CustomDropdown from '../components/CustomDropdown';
 
 const CodeRepository = ({ activeConfigId }) => {
     const { activePipelines, startPipelineForService } = useContext(PipelineContext);
@@ -103,10 +104,22 @@ const CodeRepository = ({ activeConfigId }) => {
 
     const loadServices = async () => {
         try {
-            const data = await fetchBillingServices(activeConfigId);
-            const active = data.active_services || [];
+            const [billingData, registryData] = await Promise.all([
+                fetchBillingServices(activeConfigId),
+                fetchRegistry()
+            ]);
+            const active = billingData.active_services || [];
             setRawServicesData(active);
-            const unique = Array.from(new Set(active.map(s => s.service_name)));
+            
+            const allowedServiceNames = new Set(
+                registryData
+                    .filter(r => r.supports_right_sizing)
+                    .map(r => r.service_name)
+            );
+            
+            const unique = Array.from(new Set(active.map(s => s.service_name)))
+                .filter(name => allowedServiceNames.has(name));
+                
             setServices(unique);
         } catch (e) {
             console.error(e);
@@ -194,14 +207,12 @@ const CodeRepository = ({ activeConfigId }) => {
                     <div className="space-y-3">
                         <div>
                             <label className="text-[10px] text-zinc-500 uppercase tracking-wider block mb-1">Target Service</label>
-                            <select 
-                                className="w-full text-xs bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-white"
+                            <CustomDropdown 
                                 value={selectedService}
-                                onChange={e => setSelectedService(e.target.value)}
-                            >
-                                <option value="">Choose Service...</option>
-                                {services.map(s => <option key={s} value={s}>{s}</option>)}
-                            </select>
+                                onChange={(val) => setSelectedService(val)}
+                                options={services.map(s => ({ value: s, label: s }))}
+                                placeholder="Choose Service..."
+                            />
                         </div>
                         
                         <button 
