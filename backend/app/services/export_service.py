@@ -6,7 +6,7 @@ from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment
 from openpyxl.utils import get_column_letter
 
-from src.db import get_db_connection
+from app.core.database import get_db_connection
 
 def apply_header_formatting(ws, headers):
     ws.append(headers)

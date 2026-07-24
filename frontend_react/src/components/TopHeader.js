@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Bell, Search, User, ChevronDown, ShieldCheck } from 'lucide-react';
-import { fetchCloudConfigs, runPipeline, scanBillingServices, validateCloudConfig } from '../services/api';
+import { Bell, Search, User, ChevronDown, ShieldCheck, Menu } from 'lucide-react';
+import { fetchCloudConfigs, runPipeline, scanBillingServices, validateCloudConfig } from '../api/api';
+import { useNavigate } from 'react-router-dom';
 
-const TopHeader = ({ activeConfigId, setActiveConfigId, setActiveTab }) => {
+const TopHeader = ({ activeConfigId, setActiveConfigId, setIsMobileMenuOpen }) => {
+    const navigate = useNavigate();
     const [configs, setConfigs] = useState([]);
     const [loadingConfigs, setLoadingConfigs] = useState(true);
     const [isScanning, setIsScanning] = useState(false);
@@ -53,9 +55,7 @@ const TopHeader = ({ activeConfigId, setActiveConfigId, setActiveTab }) => {
             // Trigger fetch from Cost Explorer
             await scanBillingServices(activeConfigId);
             // Switch to Services Discovery tab to display the services
-            if (setActiveTab) {
-                setActiveTab('services');
-            }
+            navigate('/services');
             alert("Scan completed! Billing services cache updated.");
         } catch (e) {
             alert(e.message);
@@ -67,6 +67,12 @@ const TopHeader = ({ activeConfigId, setActiveConfigId, setActiveTab }) => {
     return (
         <header className="h-16 flex items-center justify-between px-6 border-b border-zinc-800/50 bg-black shrink-0">
             <div className="flex items-center gap-4">
+                <button 
+                    className="md:hidden text-zinc-400 hover:text-white transition-colors"
+                    onClick={() => setIsMobileMenuOpen(true)}
+                >
+                    <Menu size={20} />
+                </button>
                 <div className="relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" size={16} />
                     <input 

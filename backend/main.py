@@ -7,24 +7,28 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, StreamingResponse
 import json
-from pydantic import BaseModel
+from app.schemas.schema import (
+    CloudConfigCreateSchema, RegistryUpdateSchema, CodeGenRequestSchema,
+    CodeReviewRequestSchema, RunPipelineRequestSchema, ScanRequest
+)
 from typing import List, Optional
 from concurrent.futures import ThreadPoolExecutor, as_completed
 # Add the parent folder to path to resolve src imports properly
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from src.db import init_db, get_db_connection
-from src.aws_clients import query_cost_explorer_services, get_boto3_session
-from src.services.filtration import process_active_services, get_registry, update_registry_service
-from src.services.known_check import determine_service_status
-from src.services.repository import (
+from app.core.database import get_db_connection
+from app.models.schema import init_db
+from app.services.aws_clients import query_cost_explorer_services, get_boto3_session
+from app.services.filtration import process_active_services, get_registry, update_registry_service
+from app.services.known_check import determine_service_status
+from app.services.repository import (
     get_all_services_code_status, save_code_version, 
     get_latest_component_version, update_review_status, get_component_history,
     get_latest_code_for_service
 )
-from src.services.code_gen import generate_component_a, generate_component_b, generate_component_c
-from src.services.execution import run_pipeline_for_service
-from src.services.recommendation import get_saved_recommendations, generate_recommendation_for_resource, generate_recommendations_batch
+from app.services.code_gen import generate_component_a, generate_component_b, generate_component_c
+from app.services.execution import run_pipeline_for_service
+from app.services.recommendation import get_saved_recommendations, generate_recommendation_for_resource, generate_recommendations_batch
 
 # Initialize database
 init_db()
@@ -40,43 +44,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# API Schemas
-class CloudConfigCreateSchema(BaseModel):
-    provider: str
-    account_name: str
-    region: str
-    use_iam_role: bool
-    access_key: Optional[str] = None
-    secret_key: Optional[str] = None
-    session_token: Optional[str] = None
-    assume_role_arn: Optional[str] = None
-    external_id: Optional[str] = None
-
-class RegistryUpdateSchema(BaseModel):
-    service_name: str
-    supports_right_sizing: bool
-
-class CodeGenRequestSchema(BaseModel):
-    account_id: str
-    service_name: str
-
-class CodeReviewRequestSchema(BaseModel):
-    code_id: int
-    status: str # 'approved', 'rejected'
-    reviewer_id: str
-    override_code: Optional[str] = None
-
-class RunPipelineRequestSchema(BaseModel):
-    account_id: str
-    service_name: str
-    regions: List[str]
-    lookback_days: Optional[int] = 30
+# --- API Routes ---
 
 
 # --- API Routes ---
 
 def validate_aws_credentials(account_id: str) -> dict:
-    from src.db import get_db_connection
+    from app.core.database import get_db_connection
     import botocore.exceptions
     
     conn = get_db_connection()
@@ -123,7 +97,7 @@ def get_active_services(account_id: Optional[str] = Query(None), lookback_days: 
     if not account_id:
         return {"active_services": [], "unclassified_services": [], "last_scanned": None}
 
-    from src.db import get_db_connection
+    from app.core.database import get_db_connection
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM billing_service_cache WHERE account_id = ?", (account_id,))
@@ -148,10 +122,6 @@ def get_active_services(account_id: Optional[str] = Query(None), lookback_days: 
         "last_scanned": last_scanned
     }
 
-class ScanRequest(BaseModel):
-    account_id: str
-    lookback_days: Optional[int] = 30
-
 @app.post("/api/discovery/scan")
 def scan_active_services(data: ScanRequest):
     """
@@ -170,7 +140,7 @@ def scan_active_services(data: ScanRequest):
         
     now = datetime.datetime.now(datetime.timezone.utc).isoformat()
 
-    from src.db import get_db_connection
+    from app.core.database import get_db_connection
     conn = get_db_connection()
     try:
         cursor = conn.cursor()
@@ -214,7 +184,7 @@ def get_services_summary(account_id: Optional[str] = Query(None), lookback_days:
     all_services = process_active_services(raw_ce_results)
     filtered = [s for s in all_services if s['is_known']]
     
-    from src.db import get_db_connection
+    from app.core.database import get_db_connection
     conn = get_db_connection()
     cursor = conn.cursor()
     
@@ -350,7 +320,7 @@ def get_configs():
     """
     Retrieve all registered cloud configurations.
     """
-    from src.db import get_db_connection
+    from app.core.database import get_db_connection
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("""
@@ -404,7 +374,7 @@ def create_config(data: CloudConfigCreateSchema):
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Failed to verify credentials with STS: {e}")
         
-    from src.db import get_db_connection
+    from app.core.database import get_db_connection
     conn = get_db_connection()
     cursor = conn.cursor()
     
@@ -449,7 +419,7 @@ def delete_config(account_id: str):
     """
     Delete a cloud configuration.
     """
-    from src.db import get_db_connection
+    from app.core.database import get_db_connection
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("DELETE FROM cloud_configs WHERE account_id = ?", (account_id,))
@@ -623,7 +593,7 @@ def run_service_execution(data: RunPipelineRequestSchema):
         llm_duration = time.time() - t_llm_start
             
         # Garbage Collection: Delete ghost records not updated during this run
-        from src.db import get_db_connection
+        from app.core.database import get_db_connection
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
@@ -647,7 +617,7 @@ def run_service_execution(data: RunPipelineRequestSchema):
         start_time_iso = datetime.datetime.utcnow().isoformat() + "Z"
         
         # Initialize execution in DB
-        from src.db import get_db_connection
+        from app.core.database import get_db_connection
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute('''
@@ -737,7 +707,7 @@ def get_execution_history(account_id: str, service_name: str):
     """
     Fetch pipeline execution history for a service.
     """
-    from src.db import get_db_connection
+    from app.core.database import get_db_connection
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute('''
@@ -762,7 +732,7 @@ def export_report(account_id: str, service_name: str, region: Optional[str] = No
     """
     Export Analysis Report as an Excel file.
     """
-    from src.services.export_service import generate_export_workbook
+    from app.services.export_service import generate_export_workbook
     from fastapi.responses import StreamingResponse
     import datetime
     
@@ -782,7 +752,7 @@ def get_resource_metrics(account_id: str, resource_id: str, start_time: Optional
     """
     Fetch raw metrics points for a resource.
     """
-    from src.db import get_db_connection
+    from app.core.database import get_db_connection
     conn = get_db_connection()
     cursor = conn.cursor()
     

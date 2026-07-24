@@ -1,5 +1,5 @@
 import datetime
-from src.db import get_db_connection
+from app.core.database import get_db_connection
 
 def save_code_version(account_id, service_name, component_type, code_content, status, generated_by, reviewed_by=None, reviewed_at=None):
     """

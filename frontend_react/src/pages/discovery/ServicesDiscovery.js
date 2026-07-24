@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { fetchBillingServices, fetchRegistry } from '../services/api';
+import { fetchBillingServices, fetchRegistry } from '../../api/api';
 import { Layers, Server, Globe } from 'lucide-react';
 
 const ServicesDiscovery = ({ activeConfigId }) => {

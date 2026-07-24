@@ -1,4 +1,4 @@
-from src.services.repository import get_latest_approved_component
+from app.services.repository import get_latest_approved_component
 
 def determine_service_status(account_id, service_name):
     """

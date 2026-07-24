@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { fetchRecommendations, fetchAnalyzedServices, fetchBillingServices, fetchResourceMetrics, exportAnalysisReport } from '../services/api';
+import { fetchRecommendations, fetchAnalyzedServices, fetchBillingServices, fetchResourceMetrics, exportAnalysisReport } from '../../api/api';
 import { Search, ChevronDown, Code, X, Download, ArrowUp } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Virtuoso } from 'react-virtuoso';

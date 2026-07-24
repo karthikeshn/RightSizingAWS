@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Trash2, Shield, RefreshCw } from 'lucide-react';
-import { fetchCloudConfigs, addCloudConfig, deleteCloudConfig, validateCloudConfig } from '../services/api';
+import { fetchCloudConfigs, addCloudConfig, deleteCloudConfig, validateCloudConfig } from '../../api/api';
 
 export default function CloudConfig() {
   const [configs, setConfigs] = useState([]);

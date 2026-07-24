@@ -1,5 +1,5 @@
-from src.db import get_db_connection
-from src.services.service_mapping import SERVICE_MAPPING
+from app.core.database import get_db_connection
+from app.services.service_mapping import SERVICE_MAPPING
 
 def get_registry():
     """

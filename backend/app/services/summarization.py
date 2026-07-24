@@ -1,6 +1,6 @@
 import math
 import datetime
-from src.services.metric_store import get_metric_points, get_metrics_for_resource
+from app.services.metric_store import get_metric_points, get_metrics_for_resource
 
 def calculate_slope(values):
     """

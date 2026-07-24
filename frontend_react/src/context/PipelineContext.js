@@ -1,5 +1,5 @@
 import React, { createContext, useState } from 'react';
-import { runPipeline } from '../services/api';
+import { runPipeline } from '../api/api';
 
 export const PipelineContext = createContext();
 

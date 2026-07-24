@@ -1,8 +1,8 @@
 import json
 import datetime
-from src.llm_clients import generate_text
-from src.services.summarization import summarize_resource_metrics, format_summary_to_text
-from src.db import get_db_connection
+from app.services.llm_clients import generate_text
+from app.services.summarization import summarize_resource_metrics, format_summary_to_text
+from app.core.database import get_db_connection
 
 def generate_recommendation_for_resource(account_id, resource_id, service_type, region, resource_capacity_type="N/A", lookback_days=30, metadata=None):
     if metadata is None:

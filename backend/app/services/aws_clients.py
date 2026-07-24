@@ -53,7 +53,7 @@ class ReadOnlySessionWrapper:
 
 def get_boto3_session(account_id=None):
     if account_id is not None:
-        from src.db import get_db_connection
+        from app.core.database import get_db_connection
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM cloud_configs WHERE account_id = ?", (account_id,))
@@ -125,7 +125,7 @@ def get_sandboxed_session(account_id=None):
 def query_cost_explorer_services(lookback_days=30, account_id=None):
     region_name = "us-east-1"
     if account_id is not None:
-        from src.db import get_db_connection
+        from app.core.database import get_db_connection
         conn = get_db_connection()
         row = conn.execute("SELECT region FROM cloud_configs WHERE account_id = ?", (account_id,)).fetchone()
         conn.close()
@@ -136,7 +136,7 @@ def query_cost_explorer_services(lookback_days=30, account_id=None):
         session = get_boto3_session(account_id)
         # Skip calling Cost Explorer for mock configurations to prevent credentials error
         if account_id is not None:
-            from src.db import get_db_connection
+            from app.core.database import get_db_connection
             conn = get_db_connection()
             row = conn.execute("SELECT access_key, secret_key FROM cloud_configs WHERE account_id = ?", (account_id,)).fetchone()
             conn.close()

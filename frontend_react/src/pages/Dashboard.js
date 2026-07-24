@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { fetchRecommendations } from '../services/api';
+import { fetchRecommendations } from '../api/api';
 import { CheckCircle, AlertTriangle, EyeOff, Target, X } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const Modal = ({ isOpen, onClose, title, data, icon: Icon, colorClass, onItemClick }) => {
     if (!isOpen) return null;
@@ -39,7 +40,8 @@ const Modal = ({ isOpen, onClose, title, data, icon: Icon, colorClass, onItemCli
     );
 };
 
-const Dashboard = ({ activeConfigId, setActiveTab, setTargetService }) => {
+const Dashboard = ({ activeConfigId, setTargetService }) => {
+    const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [recommendations, setRecommendations] = useState([]);
     const [error, setError] = useState(null);
@@ -130,7 +132,7 @@ const Dashboard = ({ activeConfigId, setActiveTab, setTargetService }) => {
                 <div><h1 className="text-2xl font-bold">Dashboard</h1><p className="text-sm text-zinc-500">AI-driven right-sizing recommendations overview</p></div>
             </div>
 
-            <div className="grid grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {/* Optimization Score */}
                 <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-xl p-4 flex flex-col justify-between">
                     <div className="flex items-center justify-between mb-2">
@@ -194,9 +196,9 @@ const Dashboard = ({ activeConfigId, setActiveTab, setTargetService }) => {
                 icon={AlertTriangle}
                 colorClass="text-yellow-400"
                 onItemClick={(service) => {
-                    if (setTargetService && setActiveTab) {
+                    if (setTargetService) {
                         setTargetService(service);
-                        setActiveTab('analysis');
+                        navigate('/analysis');
                     }
                 }}
             />
@@ -209,9 +211,9 @@ const Dashboard = ({ activeConfigId, setActiveTab, setTargetService }) => {
                 icon={EyeOff}
                 colorClass="text-red-400"
                 onItemClick={(service) => {
-                    if (setTargetService && setActiveTab) {
+                    if (setTargetService) {
                         setTargetService(service);
-                        setActiveTab('analysis');
+                        navigate('/analysis');
                     }
                 }}
             />

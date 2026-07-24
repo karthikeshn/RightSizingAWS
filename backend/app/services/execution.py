@@ -1,9 +1,9 @@
 import datetime
 import json
 import traceback
-from src.aws_clients import get_sandboxed_session, MutationAttemptException
-from src.services.repository import get_latest_approved_component
-from src.services.metric_store import save_metric_points
+from app.services.aws_clients import get_sandboxed_session, MutationAttemptException
+from app.services.repository import get_latest_approved_component
+from app.services.metric_store import save_metric_points
 
 def filter_primary_resources(service_name, resources):
     """
@@ -136,7 +136,7 @@ def run_pipeline_for_service(account_id, service_name, region, lookback_days=30)
         # Persist discovered resources
         t2 = time.time()
         now_str = datetime.datetime.utcnow().isoformat()
-        from src.db import get_db_connection
+        from app.core.database import get_db_connection
         conn = get_db_connection()
         cursor = conn.cursor()
         for r in resources:

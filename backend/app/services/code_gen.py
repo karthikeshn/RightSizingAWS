@@ -1,6 +1,6 @@
 import re
 import json
-from src.llm_clients import generate_text
+from app.services.llm_clients import generate_text
 
 # Blocklist of mutating AWS API verbs (NFR-1 / FR-4.5)
 MUTATING_BLOCKLIST = [

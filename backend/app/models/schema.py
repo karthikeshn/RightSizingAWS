@@ -1,13 +1,4 @@
-import sqlite3
-import os
-import json
-
-DB_FILE = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "db.sqlite")
-
-def get_db_connection():
-    conn = sqlite3.connect(DB_FILE, timeout=15.0)
-    conn.row_factory = sqlite3.Row
-    return conn
+from app.core.database import get_db_connection
 
 def init_db():
     conn = get_db_connection()
@@ -18,16 +9,12 @@ def init_db():
     if cursor.fetchone():
         cursor.execute("PRAGMA table_info(cloud_configs)")
         columns = [row['name'] for row in cursor.fetchall()]
-        
-        # In case the table is missing the original account_id migration, we handle it if needed
-        # But assuming it's already migrated (since config_id was missing), we just add new columns
         if 'status' not in columns:
             cursor.execute("ALTER TABLE cloud_configs ADD COLUMN status TEXT DEFAULT 'Connected'")
         if 'last_verified_at' not in columns:
             cursor.execute("ALTER TABLE cloud_configs ADD COLUMN last_verified_at TEXT")
         conn.commit()
     
-    # 1. Cloud Configurations (Module 0)
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS cloud_configs (
             account_id TEXT PRIMARY KEY,
@@ -45,7 +32,6 @@ def init_db():
         )
     """)
     
-    # 2. Right-Sizing Supported Services Registry (Module 2)
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS services_registry (
             service_name TEXT PRIMARY KEY,
@@ -53,24 +39,22 @@ def init_db():
         )
     """)
     
-    # 3. Code Repository (Module 5)
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS code_repository (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             account_id TEXT,
             service_name TEXT NOT NULL,
-            component_type TEXT NOT NULL, -- 'discovery', 'metric_identification', 'metric_fetching'
+            component_type TEXT NOT NULL,
             version INTEGER NOT NULL,
             code_content TEXT NOT NULL,
-            status TEXT NOT NULL, -- 'pending_review', 'approved', 'rejected', 'edited'
-            generated_by TEXT NOT NULL, -- 'openai', 'gemini', 'manual_edit'
+            status TEXT NOT NULL,
+            generated_by TEXT NOT NULL,
             reviewed_by TEXT,
             reviewed_at TEXT,
             created_at TEXT NOT NULL
         )
     """)
     
-    # 4. Metric Store (Module 8)
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS metric_store (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -85,7 +69,6 @@ def init_db():
         )
     """)
     
-    # 5. Resource Summaries & Recommendations (Module 9 / 10)
     cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='resource_summaries'")
     if cursor.fetchone():
         cursor.execute("PRAGMA table_info(resource_summaries)")
@@ -102,15 +85,13 @@ def init_db():
             region TEXT NOT NULL,
             analysis_date TEXT NOT NULL,
             summary_json TEXT NOT NULL,
-            recommendation TEXT NOT NULL, -- 'Upsize', 'Downsize', 'Keep Current', 'Specific Instance', 'Analysis Failed'
+            recommendation TEXT NOT NULL,
             explanation TEXT NOT NULL,
             raw_llm_response TEXT DEFAULT '',
             PRIMARY KEY (resource_id, account_id)
         )
-
     """)
     
-    # 6. Discovered Resources
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS discovered_resources (
             resource_id TEXT NOT NULL,
@@ -124,7 +105,6 @@ def init_db():
         )
     """)
     
-    # Seed default values for registry
     cursor.execute("SELECT COUNT(*) FROM services_registry")
     if cursor.fetchone()[0] == 0:
         defaults = [
@@ -137,7 +117,6 @@ def init_db():
         ]
         cursor.executemany("INSERT INTO services_registry (service_name, supports_right_sizing) VALUES (?, ?)", defaults)
         
-    # 6. Billing Service Cache (Module 1/2)
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS billing_service_cache (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -150,7 +129,6 @@ def init_db():
         )
     """)
     
-    # 7. Pipeline Executions (History)
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS pipeline_executions (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -171,8 +149,3 @@ def init_db():
     
     conn.commit()
     conn.close()
-
-if __name__ == "__main__":
-    init_db()
-    print("Database initialized successfully at:", DB_FILE)
-

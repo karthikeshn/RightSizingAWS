@@ -1,5 +1,5 @@
 import datetime
-from src.db import get_db_connection
+from app.core.database import get_db_connection
 
 def init_metric_store_indices():
     """

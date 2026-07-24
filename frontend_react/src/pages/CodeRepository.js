@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { fetchBillingServices, generateCode, reviewCode, validateCloudConfig, fetchLatestCode, fetchExecutionHistory, fetchRegistry } from '../services/api';
+import { fetchBillingServices, generateCode, reviewCode, validateCloudConfig, fetchLatestCode, fetchExecutionHistory, fetchRegistry } from '../api/api';
 import { Code, XCircle, Play, RefreshCw, Save, Loader } from 'lucide-react';
 import { PipelineContext } from '../context/PipelineContext';
 import CustomDropdown from '../components/CustomDropdown';
