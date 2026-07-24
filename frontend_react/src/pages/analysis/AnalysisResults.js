@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { fetchRecommendations, fetchAnalyzedServices, fetchBillingServices, fetchResourceMetrics, exportAnalysisReport } from '../../api/api';
 import { Search, ChevronDown, Code, X, Download, ArrowUp } from 'lucide-react';
+import CustomDropdown from '../../components/CustomDropdown';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Virtuoso } from 'react-virtuoso';
 import { createPortal } from 'react-dom';
@@ -280,35 +281,32 @@ const AnalysisResults = ({ activeConfigId, targetService, setTargetService }) =>
             <div className="bg-zinc-900/30 border border-zinc-800/50 rounded-xl p-4 shrink-0 flex items-center gap-4 relative z-20">
                 <div className="flex flex-col w-48">
                     <label className="text-[10px] text-zinc-500 uppercase tracking-wider mb-1 font-semibold">Service</label>
-                    <select 
-                        className="bg-zinc-900/50 border border-zinc-700/50 rounded-lg px-3 py-1.5 text-sm text-zinc-300 focus:outline-none focus:border-zinc-500 hover:border-zinc-600 transition-colors cursor-pointer"
+                    <CustomDropdown
+                        options={services}
                         value={serviceFilter}
-                        onChange={e => setServiceFilter(e.target.value)}
-                    >
-                        {services.map(s => <option key={s} value={s}>{s}</option>)}
-                    </select>
+                        onChange={setServiceFilter}
+                        className="w-full"
+                    />
                 </div>
                 
                 <div className="flex flex-col w-48">
                     <label className="text-[10px] text-zinc-500 uppercase tracking-wider mb-1 font-semibold">Region</label>
-                    <select 
-                        className="bg-zinc-900/50 border border-zinc-700/50 rounded-lg px-3 py-1.5 text-sm text-zinc-300 focus:outline-none focus:border-zinc-500 hover:border-zinc-600 transition-colors cursor-pointer"
+                    <CustomDropdown
+                        options={availableRegions}
                         value={regionFilter}
-                        onChange={e => setRegionFilter(e.target.value)}
-                    >
-                        {availableRegions.map(r => <option key={r} value={r}>{r}</option>)}
-                    </select>
+                        onChange={setRegionFilter}
+                        className="w-full"
+                    />
                 </div>
 
                 <div className="flex flex-col w-48">
                     <label className="text-[10px] text-zinc-500 uppercase tracking-wider mb-1 font-semibold">Recommendation</label>
-                    <select 
-                        className="bg-zinc-900/50 border border-zinc-700/50 rounded-lg px-3 py-1.5 text-sm text-zinc-300 focus:outline-none focus:border-zinc-500 hover:border-zinc-600 transition-colors cursor-pointer"
+                    <CustomDropdown
+                        options={recOptions}
                         value={recFilter}
-                        onChange={e => setRecFilter(e.target.value)}
-                    >
-                        {recOptions.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
-                    </select>
+                        onChange={setRecFilter}
+                        className="w-full"
+                    />
                 </div>
 
                 <div className="flex flex-col flex-1">
@@ -459,18 +457,41 @@ const AnalysisResults = ({ activeConfigId, targetService, setTargetService }) =>
                                             No metrics available
                                         </div>
                                     ) : (
-                                        <ResponsiveContainer width="100%" height={220}>
-                                            <LineChart data={metricData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                                                <CartesianGrid strokeDasharray="3 3" stroke="#27272a" vertical={false} />
-                                                <XAxis dataKey="name" stroke="#52525b" fontSize={10} tickMargin={10} angle={-45} textAnchor="end" height={50} />
-                                                <YAxis stroke="#52525b" fontSize={10} axisLine={false} tickLine={false} />
-                                                <Tooltip 
-                                                    contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', borderRadius: '8px', fontSize: '12px' }}
-                                                    itemStyle={{ color: '#a78bfa' }}
-                                                />
-                                                <Line type="monotone" dataKey="value" stroke="#8b5cf6" strokeWidth={2} dot={false} activeDot={{ r: 4 }} />
-                                            </LineChart>
-                                        </ResponsiveContainer>
+                                        <div className="flex-1 w-full relative">
+                                            <div className="absolute -top-3 left-0 right-0 text-center z-10 pointer-events-none">
+                                                <h4 className="text-xs font-bold text-zinc-400 bg-[#111115] px-3 py-1 inline-block rounded-full border border-zinc-800/50">
+                                                    {metricData[0]?.metricName || 'Resource Metric'} over Time
+                                                </h4>
+                                            </div>
+                                            <ResponsiveContainer width="100%" height={220}>
+                                                <LineChart data={metricData} margin={{ top: 20, right: 20, left: 0, bottom: 20 }}>
+                                                    <CartesianGrid strokeDasharray="3 3" stroke="#27272a" vertical={false} />
+                                                    <XAxis 
+                                                        dataKey="name" 
+                                                        stroke="#52525b" 
+                                                        fontSize={10} 
+                                                        tickMargin={10} 
+                                                        angle={-45} 
+                                                        textAnchor="end" 
+                                                        height={50} 
+                                                        label={{ value: 'Date / Time', position: 'bottom', fill: '#71717a', fontSize: 10, offset: 0 }}
+                                                    />
+                                                    <YAxis 
+                                                        stroke="#52525b" 
+                                                        fontSize={10} 
+                                                        axisLine={false} 
+                                                        tickLine={false} 
+                                                        label={{ value: metricData[0]?.metricName || 'Value', angle: -90, position: 'insideLeft', fill: '#71717a', fontSize: 10, offset: 15 }}
+                                                    />
+                                                    <Tooltip 
+                                                        contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', borderRadius: '8px', fontSize: '12px' }}
+                                                        itemStyle={{ color: '#a78bfa' }}
+                                                        labelStyle={{ color: '#71717a', marginBottom: '4px' }}
+                                                    />
+                                                    <Line type="monotone" dataKey="value" stroke="#8b5cf6" strokeWidth={2} dot={false} activeDot={{ r: 4 }} name={metricData[0]?.metricName || 'Value'} />
+                                                </LineChart>
+                                            </ResponsiveContainer>
+                                        </div>
                                     )}
                                 </div>
 

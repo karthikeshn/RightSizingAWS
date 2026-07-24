@@ -25,6 +25,12 @@ const CodeRepository = ({ activeConfigId }) => {
         metric_identification: { code: '', status: 'Pending', id: null },
         metric_fetching: { code: '', status: 'Pending', id: null }
     });
+    
+    const [toastMessage, setToastMessage] = useState('');
+    const showToast = (msg) => {
+        setToastMessage(msg);
+        setTimeout(() => setToastMessage(''), 3000);
+    };
 
     useEffect(() => {
         if (activeConfigId) loadServices();
@@ -161,7 +167,7 @@ const CodeRepository = ({ activeConfigId }) => {
         try {
             const res = await reviewCode(compState.id, approved, 'admin', currentCode);
             setCodeState(prev => ({ ...prev, [activeComponent]: { ...prev[activeComponent], status: res.status } }));
-            if (!approved) alert("Component rejected. The backend has logged the rejection.");
+            if (!approved) showToast("Component rejected. The backend has logged the rejection.");
         } catch (e) {
             alert(e.message);
         }
@@ -196,7 +202,16 @@ const CodeRepository = ({ activeConfigId }) => {
     };
 
     return (
-        <div className="flex flex-col gap-5 h-[calc(100vh-120px)] max-w-6xl overflow-y-auto scrollbar-thin pr-2 pb-10">
+        <div className="flex flex-col gap-5 h-[calc(100vh-120px)] max-w-6xl overflow-y-auto scrollbar-thin pr-2 pb-10 relative">
+            {toastMessage && (
+                <div className="fixed bottom-6 right-6 z-50 bg-zinc-800 border border-zinc-700 shadow-2xl rounded-lg p-4 flex items-center gap-3 animate-fade-in">
+                    <div className="w-8 h-8 rounded-full bg-red-500/20 flex items-center justify-center text-red-400">
+                        <XCircle size={18} />
+                    </div>
+                    <span className="text-sm font-medium text-white">{toastMessage}</span>
+                </div>
+            )}
+            
             <div className="flex gap-5 min-h-[500px] shrink-0">
                 {/* Left Panel */}
                 <div className="w-80 flex flex-col gap-4">

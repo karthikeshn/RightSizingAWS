@@ -56,11 +56,13 @@ def validate_aws_credentials(account_id: str) -> dict:
     conn = get_db_connection()
     try:
         cursor = conn.cursor()
-        cursor.execute("SELECT access_key, secret_key FROM cloud_configs WHERE account_id = ?", (account_id,))
+        cursor.execute("SELECT access_key, secret_key, status FROM cloud_configs WHERE account_id = ?", (account_id,))
         row = cursor.fetchone()
         
         if not row:
             raise HTTPException(status_code=404, detail="Cloud config not found")
+            
+        old_status = row['status']
             
         if row['access_key'] == 'mock' or row['secret_key'] == 'mock':
             status = "Connected"
@@ -81,6 +83,11 @@ def validate_aws_credentials(account_id: str) -> dict:
             except Exception as e:
                 status = f"Connection Failed: {str(e)}"
                 
+        if status == "Token Expired" and old_status != "Token Expired":
+            log_activity(account_id, "registry", "Your AWS credentials have expired. Please update them.")
+        elif status == "Incorrect Credentials" and old_status != "Incorrect Credentials":
+            log_activity(account_id, "registry", "Your AWS credentials failed validation. Please check them.")
+                
         now = datetime.datetime.now(datetime.timezone.utc).isoformat()
         cursor.execute("UPDATE cloud_configs SET status = ?, last_verified_at = ? WHERE account_id = ?", (status, now, account_id))
         conn.commit()
@@ -88,6 +95,51 @@ def validate_aws_credentials(account_id: str) -> dict:
         conn.close()
     
     return {"status": status, "last_verified_at": now}
+
+def log_activity(account_id: str, activity_type: str, message: str):
+    from app.core.database import get_db_connection
+    conn = get_db_connection()
+    try:
+        now = datetime.datetime.now(datetime.timezone.utc).isoformat()
+        cursor = conn.cursor()
+        cursor.execute(
+            "INSERT INTO activity_logs (account_id, activity_type, message, timestamp) VALUES (?, ?, ?, ?)",
+            (account_id, activity_type, message, now)
+        )
+        conn.commit()
+    except Exception as e:
+        print(f"Failed to log activity: {e}")
+    finally:
+        conn.close()
+
+@app.get("/api/activities")
+def get_activities(account_id: Optional[str] = Query(None), limit: int = 50):
+    if not account_id:
+        return []
+    from app.core.database import get_db_connection
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT * FROM activity_logs WHERE account_id = ? OR account_id = 'admin' ORDER BY timestamp DESC LIMIT ?", 
+            (account_id, limit)
+        )
+        rows = cursor.fetchall()
+        return [dict(row) for row in rows]
+    finally:
+        conn.close()
+
+@app.delete("/api/activities/{activity_id}")
+def delete_activity(activity_id: int):
+    from app.core.database import get_db_connection
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM activity_logs WHERE id = ?", (activity_id,))
+        conn.commit()
+        return {"message": "Deleted"}
+    finally:
+        conn.close()
 
 @app.get("/api/discovery/active-services")
 def get_active_services(account_id: Optional[str] = Query(None), lookback_days: int = 30):
@@ -311,6 +363,8 @@ def update_registry(data: RegistryUpdateSchema):
     Module 2: Update supports_right_sizing flag for a service.
     """
     update_registry_service(data.service_name, data.supports_right_sizing)
+    action = "enabled" if data.supports_right_sizing else "disabled"
+    log_activity("admin", "registry", f"Service {data.service_name} was {action} for right-sizing.")
     return {"message": f"Registry updated for {data.service_name}"}
 
 # --- Cloud Config endpoints (Module 0) ---
@@ -403,6 +457,8 @@ def create_config(data: CloudConfigCreateSchema):
         ))
         msg = "Cloud config created."
         
+    log_activity(account_id, "registry", "AWS credentials connected successfully.")
+        
     conn.commit()
     conn.close()
     return {"message": msg, "id": account_id}
@@ -453,6 +509,8 @@ def generate_service_code(data: CodeGenRequestSchema):
     service = data.service_name
     account_id = data.account_id
     
+    log_activity(account_id, "code_gen", f"Code generation initiated for {service}.")
+    
     try:
         # Generate discovery
         code_a = generate_component_a(service)
@@ -500,6 +558,19 @@ def review_service_code(data: CodeReviewRequestSchema):
             reviewer_id=data.reviewer_id,
             override_code=data.override_code
         )
+        from app.core.database import get_db_connection
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT service_name, component_type FROM code_repository WHERE id = ?", (data.code_id,))
+        row = cursor.fetchone()
+        conn.close()
+        
+        svc_name = row['service_name'] if row else "Unknown Service"
+        comp_type = row['component_type'] if row else "code"
+        comp_display = comp_type.replace('_', ' ').title()
+        
+        action = "approved" if data.status.lower() == "approved" else "rejected"
+        log_activity("admin", "code_review", f"{comp_display} code for {svc_name} was {action}.")
         return {
             "message": "Review submitted successfully.",
             "code_id": new_id,
@@ -531,6 +602,8 @@ def run_service_execution(data: RunPipelineRequestSchema):
             status_code=400, 
             detail=f"Service {data.service_name} has unapproved components. Approve code before running execution."
         )
+
+    log_activity(data.account_id, "pipeline", f"Pipeline executed for {data.service_name}.")
 
     import time
     import logging

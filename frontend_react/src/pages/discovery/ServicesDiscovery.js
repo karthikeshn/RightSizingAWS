@@ -1,6 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { fetchBillingServices, fetchRegistry } from '../../api/api';
-import { Layers, Server, Globe } from 'lucide-react';
+import { Layers, Server, Globe, Database, HardDrive, Cloud, Box, Shield, Zap, Network, Archive } from 'lucide-react';
+
+const getServiceIcon = (serviceName) => {
+    const name = serviceName.toLowerCase();
+    if (name.includes('relational database') || name.includes('dynamodb') || name.includes('elasticache') || name.includes('rds')) return <Database className="h-4 w-4 text-orange-400" />;
+    if (name.includes('s3') || name.includes('simple storage') || name.includes('backup') || name.includes('efs')) return <HardDrive className="h-4 w-4 text-green-400" />;
+    if (name.includes('lambda')) return <Zap className="h-4 w-4 text-yellow-500" />;
+    if (name.includes('vpc') || name.includes('route 53') || name.includes('cloudfront')) return <Network className="h-4 w-4 text-indigo-400" />;
+    if (name.includes('cloudtrail') || name.includes('iam') || name.includes('waf') || name.includes('shield')) return <Shield className="h-4 w-4 text-red-400" />;
+    if (name.includes('container') || name.includes('ecs') || name.includes('eks')) return <Box className="h-4 w-4 text-blue-400" />;
+    if (name.includes('cloudwatch') || name.includes('sns') || name.includes('sqs')) return <Cloud className="h-4 w-4 text-zinc-400" />;
+    if (name.includes('glacier') || name.includes('archive')) return <Archive className="h-4 w-4 text-teal-400" />;
+    return <Server className="h-4 w-4 text-blue-400" />;
+};
 
 const ServicesDiscovery = ({ activeConfigId }) => {
     const [loading, setLoading] = useState(false);
@@ -99,7 +112,7 @@ const ServicesDiscovery = ({ activeConfigId }) => {
                                 <div key={i} className="px-5 py-4 hover:bg-zinc-800/20 flex items-center justify-between">
                                     <div className="flex items-center gap-4">
                                         <div className="w-8 h-8 rounded-lg bg-zinc-800 border border-zinc-700 flex items-center justify-center">
-                                            <Server className="h-4 w-4 text-zinc-400" />
+                                            {getServiceIcon(svc.service_name)}
                                         </div>
                                         <div>
                                             <span className="text-sm font-medium text-white">{svc.service_name}</span>

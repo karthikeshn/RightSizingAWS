@@ -122,3 +122,7 @@ export const exportAnalysisReport = async (accountId, serviceName, region, recFi
     
     return { blob, filename };
 };
+
+export const fetchActivities = (accountId) => api.get(`/activities?account_id=${accountId}`);
+
+export const deleteActivity = (activityId) => api.delete(`/activities/${activityId}`);
